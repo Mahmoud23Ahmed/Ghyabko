@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
@@ -15,7 +17,6 @@ class AddstudentTOsubject extends StatefulWidget {
 
 class _AddStudentState extends State<AddstudentTOsubject> {
   List<QueryDocumentSnapshot> data = [];
-  @override
   addstudent() async {
     CollectionReference student = FirebaseFirestore.instance
         .collection('subject')
@@ -26,9 +27,6 @@ class _AddStudentState extends State<AddstudentTOsubject> {
   }
 
   TextEditingController studentemail = TextEditingController();
-
-  //String studentemail = '';
-  // id = '';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

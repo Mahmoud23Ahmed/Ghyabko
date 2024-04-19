@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddSubjectButton extends StatefulWidget {
@@ -19,7 +17,6 @@ class AddSubjectButton extends StatefulWidget {
 class _AddStudentState extends State<AddSubjectButton> {
   List<QueryDocumentSnapshot> data = [];
   // GlobalKey<FormState> formstate = GlobalKey<FormState>();
-  @override
   CollectionReference subject =
       FirebaseFirestore.instance.collection('subject');
 
@@ -34,14 +31,11 @@ class _AddStudentState extends State<AddSubjectButton> {
         await subject.doc(widget.subjectID).collection('student').get();
     data.addAll(querySnapshot.docs);
   }
-  // bool isloading = false;
 
   addsubject() async {
-    // isloading = true;
     setState(() {});
     await subject.add(
         {'subname': nameController.text, 'docemail': emailController.text});
-    // isloading = false;
     Navigator.of(context)
         .pushNamedAndRemoveUntil("Addsubject", (route) => false);
   }

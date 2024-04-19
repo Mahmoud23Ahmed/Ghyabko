@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class EditeSubjectButton extends StatefulWidget {
@@ -19,7 +18,6 @@ class EditeSubjectButton extends StatefulWidget {
 
 class _AddStudentState extends State<EditeSubjectButton> {
   // GlobalKey<FormState> formstate = GlobalKey<FormState>();
-  @override
   CollectionReference subject =
       FirebaseFirestore.instance.collection('subject');
 
@@ -81,7 +79,7 @@ class _AddStudentState extends State<EditeSubjectButton> {
               const SizedBox(
                 height: 60,
               ),
-              const Text('ADD Subject',
+              const Text('Edit Subject',
                   style: TextStyle(color: Colors.white, fontSize: 40)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),

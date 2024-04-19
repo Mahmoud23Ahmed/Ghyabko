@@ -1,9 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
 import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
-//import 'package:ghyabko/helper/Admin_helper/list_Builder.dart';
-import 'package:ghyabko/screens/Admin/addsubbutton.dart';
 import 'package:ghyabko/screens/Admin/editbutton.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
@@ -37,12 +34,14 @@ class _AddsubjectState extends State<Addsubject> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Subject',
-          style: TextStyle(color: Colors.black),
+        backgroundColor: constColor,
+        title: Text(
+          'All Subjects',
+          style: const TextStyle(
+              fontFamily: 'LibreBaskerville',
+              fontSize: 23,
+              color: Colors.white),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0.0,
       ),
       extendBodyBehindAppBar: true,
       floatingActionButton: FloatingActionButton(
@@ -103,7 +102,7 @@ class _AddsubjectState extends State<Addsubject> {
                       child: Column(
                         children: [
                           Image.asset(
-                            "assets/light-1.png",
+                            "assets/subLogo.png",
                             height: 100,
                           ),
                           Text("${data[i]['subname']}"),
