@@ -1,23 +1,23 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
-class AddSubjectButton extends StatefulWidget {
-  final String subjectID;
-
-  const AddSubjectButton({
-    Key? key,
-    required this.subjectID,
-  }) : super(key: key);
+class EditeSubjectButton extends StatefulWidget {
+  final String id;
+  final String oldname;
+  final String oldemile;
+  const EditeSubjectButton(
+      {super.key,
+      required this.id,
+      required this.oldname,
+      required this.oldemile});
 
   @override
-  State<AddSubjectButton> createState() => _AddStudentState();
+  State<EditeSubjectButton> createState() => _AddStudentState();
 }
 
-class _AddStudentState extends State<AddSubjectButton> {
-  List<QueryDocumentSnapshot> data = [];
+class _AddStudentState extends State<EditeSubjectButton> {
   // GlobalKey<FormState> formstate = GlobalKey<FormState>();
   @override
   CollectionReference subject =
@@ -27,23 +27,23 @@ class _AddStudentState extends State<AddSubjectButton> {
 
   TextEditingController nameController = TextEditingController();
 
-  String id = '';
-
-  getstudent() async {
-    QuerySnapshot querySnapshot =
-        await subject.doc(widget.subjectID).collection('student').get();
-    data.addAll(querySnapshot.docs);
-  }
   // bool isloading = false;
 
-  addsubject() async {
+  editsubject() async {
     // isloading = true;
     setState(() {});
-    await subject.add(
+    await subject.doc(widget.id).update(
         {'subname': nameController.text, 'docemail': emailController.text});
     // isloading = false;
     Navigator.of(context)
         .pushNamedAndRemoveUntil("Addsubject", (route) => false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    nameController.text = widget.oldname;
+    emailController.text = widget.oldemile;
   }
 
   Widget build(BuildContext context) {
@@ -159,11 +159,11 @@ class _AddStudentState extends State<AddSubjectButton> {
                   color: constColor,
                   borderRadius: BorderRadius.circular(10),
                   child: MaterialButton(
-                    onPressed: () => {addsubject()},
+                    onPressed: () => {editsubject()},
                     minWidth: 140,
                     height: 60,
                     child: const Text(
-                      'Add',
+                      'Save',
                       style: TextStyle(
                         fontSize: 22.5,
                         color: Colors.white,

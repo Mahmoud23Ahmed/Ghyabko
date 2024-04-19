@@ -1,51 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
-class AddSubjectButton extends StatefulWidget {
+class AddstudentTOsubject extends StatefulWidget {
   final String subjectID;
-
-  const AddSubjectButton({
+  const AddstudentTOsubject({
     Key? key,
     required this.subjectID,
   }) : super(key: key);
 
   @override
-  State<AddSubjectButton> createState() => _AddStudentState();
+  State<AddstudentTOsubject> createState() => _AddStudentState();
 }
 
-class _AddStudentState extends State<AddSubjectButton> {
+class _AddStudentState extends State<AddstudentTOsubject> {
   List<QueryDocumentSnapshot> data = [];
-  // GlobalKey<FormState> formstate = GlobalKey<FormState>();
   @override
-  CollectionReference subject =
-      FirebaseFirestore.instance.collection('subject');
-
-  TextEditingController emailController = TextEditingController();
-
-  TextEditingController nameController = TextEditingController();
-
-  String id = '';
-
-  getstudent() async {
-    QuerySnapshot querySnapshot =
-        await subject.doc(widget.subjectID).collection('student').get();
-    data.addAll(querySnapshot.docs);
-  }
-  // bool isloading = false;
-
-  addsubject() async {
-    // isloading = true;
-    setState(() {});
-    await subject.add(
-        {'subname': nameController.text, 'docemail': emailController.text});
-    // isloading = false;
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil("Addsubject", (route) => false);
+  addstudent() async {
+    CollectionReference student = FirebaseFirestore.instance
+        .collection('subject')
+        .doc(widget.subjectID)
+        .collection('student');
+    DocumentReference response =
+        await student.add({'studentemail': studentemail.text});
   }
 
+  TextEditingController studentemail = TextEditingController();
+
+  //String studentemail = '';
+  // id = '';
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -57,15 +40,6 @@ class _AddStudentState extends State<AddSubjectButton> {
         elevation: 0.0,
       ),
       extendBodyBehindAppBar: true,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: constColor,
-        onPressed: () {},
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 35,
-        ),
-      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -81,8 +55,8 @@ class _AddStudentState extends State<AddSubjectButton> {
               const SizedBox(
                 height: 60,
               ),
-              const Text('ADD Subject',
-                  style: TextStyle(color: Colors.white, fontSize: 40)),
+              const Text('ADD Student To Subject',
+                  style: TextStyle(color: Colors.white, fontSize: 25)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
@@ -107,44 +81,13 @@ class _AddStudentState extends State<AddSubjectButton> {
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
-                  controller: nameController,
+                  controller: studentemail,
                   decoration: InputDecoration(
                     icon: Icon(
                       Icons.subject,
                       color: Colors.white,
                     ),
-                    hintText: "Enter name",
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: constColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 50,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: TextFormField(
-                  controller: emailController,
-                  decoration: InputDecoration(
-                    icon: Icon(
-                      Icons.email,
-                      color: Colors.white,
-                    ),
-                    hintText: "Enter Email",
+                    hintText: "Enter student email",
                     hintStyle: TextStyle(
                       color: Colors.white,
                     ),
@@ -159,7 +102,7 @@ class _AddStudentState extends State<AddSubjectButton> {
                   color: constColor,
                   borderRadius: BorderRadius.circular(10),
                   child: MaterialButton(
-                    onPressed: () => {addsubject()},
+                    onPressed: () => {addstudent()},
                     minWidth: 140,
                     height: 60,
                     child: const Text(
