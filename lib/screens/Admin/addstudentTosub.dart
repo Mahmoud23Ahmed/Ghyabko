@@ -2,6 +2,9 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import 'package:ghyabko/api/excel_apiforsub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddstudentTOsubject extends StatefulWidget {
@@ -17,16 +20,18 @@ class AddstudentTOsubject extends StatefulWidget {
 
 class _AddStudentState extends State<AddstudentTOsubject> {
   List<QueryDocumentSnapshot> data = [];
+  final excel_api = Get.put(excelapiforsub());
   addstudent() async {
     CollectionReference student = FirebaseFirestore.instance
         .collection('subject')
         .doc(widget.subjectID)
         .collection('student');
-    DocumentReference response =
-        await student.add({'studentemail': studentemail.text});
+    DocumentReference response = await student.add(
+        {'studentemail': studentemail.text, 'studentname': studentname.text});
   }
 
   TextEditingController studentemail = TextEditingController();
+  TextEditingController studentname = TextEditingController();
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -79,6 +84,37 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
+                  controller: studentname,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.subject,
+                      color: Colors.white,
+                    ),
+                    hintText: "Enter student name",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: constColor,
+                  boxShadow: const [
+                    BoxShadow(
+                      offset: Offset(0, 10),
+                      blurRadius: 50,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: TextFormField(
                   controller: studentemail,
                   decoration: InputDecoration(
                     icon: Icon(
@@ -94,24 +130,55 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 25),
-                child: Material(
-                  color: constColor,
-                  borderRadius: BorderRadius.circular(10),
-                  child: MaterialButton(
-                    onPressed: () => {addstudent()},
-                    minWidth: 140,
-                    height: 60,
-                    child: const Text(
+              SizedBox(
+                height: 50,
+              ),
+              Row(
+                children: [
+                  SizedBox(width: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                    ),
+                    onPressed: () {
+                      addstudent();
+                    },
+                    icon: Icon(
+                      Icons.add,
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                    label: Text(
                       'Add',
                       style: TextStyle(
-                        fontSize: 22.5,
                         color: Colors.white,
+                        fontSize: 20,
                       ),
                     ),
                   ),
-                ),
+                  SizedBox(width: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                    ),
+                    onPressed: () {
+                      excelapiforsub.instance
+                          .pickFileAndUploadExel(widget.subjectID);
+                    },
+                    icon: Icon(
+                      Icons.upload_file_rounded,
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'Upload Excel File',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
