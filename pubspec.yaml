@@ -30,6 +30,8 @@ dependencies:
   cloud_firestore: ^4.9.1
   pinput: ^4.0.0
   get: ^4.6.6
+  excel: ^4.0.3
+  file_picker: ^8.0.3
 
 dev_dependencies:
   flutter_test:

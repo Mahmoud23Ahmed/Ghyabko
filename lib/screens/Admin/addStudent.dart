@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:ghyabko/api/Excel_api.dart';
 import 'package:ghyabko/api/user_api.dart';
 import 'package:ghyabko/model/user_Model.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
@@ -16,6 +17,7 @@ class _AddStudentState extends State<AddStudent> {
   final PasswordController = TextEditingController();
 
   final user_data = Get.put(userapi());
+  final excel_api = Get.put(excelapi());
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
@@ -150,12 +152,14 @@ class _AddStudentState extends State<AddStudent> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 25),
-                  child: Material(
-                    color: constColor,
-                    borderRadius: BorderRadius.circular(10),
-                    child: MaterialButton(
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    SizedBox(width: 20),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: constColor,
+                      ),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           final user = UserModel(
@@ -164,21 +168,44 @@ class _AddStudentState extends State<AddStudent> {
                               Password: PasswordController.text.trim(),
                               Type: 'Student');
 
-                          // userapi.instance.createUser(user);
                           userapi.instance.addUser(user);
                         }
                       },
-                      minWidth: 140,
-                      height: 60,
-                      child: const Text(
+                      icon: Icon(
+                        Icons.add,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+                      label: Text(
                         'Add',
                         style: TextStyle(
-                          fontSize: 22.5,
                           color: Colors.white,
+                          fontSize: 20,
                         ),
                       ),
                     ),
-                  ),
+                    SizedBox(width: 20),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: constColor,
+                      ),
+                      onPressed: () {
+                        excelapi.instance.pickFileAndUploadExel('Student');
+                      },
+                      icon: Icon(
+                        Icons.upload_file_rounded,
+                        size: 24,
+                        color: Colors.white,
+                      ),
+                      label: Text(
+                        'Upload Excel File',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
