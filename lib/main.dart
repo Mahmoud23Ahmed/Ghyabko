@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:ghyabko/screens/Admin/AllStudent.dart';
 
 import 'package:ghyabko/screens/Admin/addsubject.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       routes: {
         'LoginPage': (context) => LoginPage(),
         'Addsubject': (context) => Addsubject(),
+        'All_Student': (context) => All_Student(),
         //'AddSubjectButton': (context) => AddSubjectButton(title: 'addsubject'),
       },
       initialRoute: 'LoginPage',
