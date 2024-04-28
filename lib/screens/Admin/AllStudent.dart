@@ -1,4 +1,8 @@
-import 'package:ghyabko/api/user_api.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
+import 'package:ghyabko/screens/Admin/editSubject.dart';
+import 'package:ghyabko/screens/Admin/editeStudent.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
@@ -11,128 +15,84 @@ class All_Student extends StatefulWidget {
 }
 
 class _All_StudentState extends State<All_Student> {
-  late Future<List<Map<String, dynamic>>> _usersFuture;
+  List<QueryDocumentSnapshot> data = [];
+  getsUser(String userType) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('Type', isEqualTo: userType)
+        .get();
+    data.addAll(querySnapshot.docs);
+  }
 
   @override
   void initState() {
+    getsUser('Student');
     super.initState();
-    _usersFuture = userapi.instance.getUsersByType('Student');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            '',
-            style: TextStyle(color: Colors.black),
-          ),
-          backgroundColor: Colors.transparent,
-          elevation: 0.0,
+      appBar: AppBar(
+        backgroundColor: constColor,
+        title: Text(
+          'Students',
+          style: const TextStyle(
+              fontFamily: 'LibreBaskerville',
+              fontSize: 23,
+              color: Colors.white),
         ),
-        extendBodyBehindAppBar: true,
-        backgroundColor: const Color(0xff12032C),
-        body: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/bg.jpg'),
-              fit: BoxFit.cover,
-              opacity: 50,
+      ),
+      extendBodyBehindAppBar: true,
+      body: GridView.builder(
+        itemCount: data.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2, mainAxisExtent: 160),
+        itemBuilder: (context, i) {
+          return InkWell(
+            onLongPress: () {
+              AwesomeDialog(
+                context: context,
+                dialogType: DialogType.warning,
+                animType: AnimType.rightSlide,
+                title: 'Are you want to edite?',
+                desc: 'choose you went to do',
+                btnOkText: 'Delete',
+                btnCancelText: 'Edit',
+                btnCancelOnPress: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EditeStudent(
+                          id: data[i].id,
+                          oldname: data[i]['Name'],
+                          oldemile: data[i]['Email'],
+                          oldPassword: data[i]['Password'])));
+                },
+                btnOkOnPress: () async {
+                  await FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(data[i].id)
+                      .delete();
+                  Navigator.of(context).pushReplacementNamed("All_Student");
+                },
+              ).show();
+            },
+            child: Card(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Image.asset(
+                      "assets/subLogo.png",
+                      height: 100,
+                    ),
+                    Text("${data[i]['Name']}"),
+                  ],
+                ),
+              ),
             ),
-          ),
-          child: Stack(
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 70, left: 120),
-                child: Text('Students',
-                    style: TextStyle(color: Colors.white, fontSize: 30)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 170, right: 10, left: 10),
-                child: TextFormField(
-                  onChanged: (data) {},
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.white,
-                    ),
-                    filled: true,
-                    fillColor: constColor,
-                    hintText: 'Enter Subject Name',
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: constColor,
-                      ),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(30)),
-                      borderSide: BorderSide(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 230, left: 10, right: 10),
-                child: SizedBox(
-                  height: 600,
-                  child: GestureDetector(
-                      child: Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                    child: Container(
-                      height: 40,
-                      alignment: AlignmentDirectional.center,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: constColor,
-                        borderRadius: BorderRadius.circular(19),
-                      ),
-                      child: FutureBuilder<List<Map<String, dynamic>>>(
-                        future: _usersFuture,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          } else if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else {
-                            List<Map<String, dynamic>> users = snapshot.data!;
-                            return ListView.builder(
-                              itemCount: users.length,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  leading: const Icon(
-                                    Icons.edit,
-                                    color: Colors.white,
-                                  ),
-                                  trailing: const Icon(Icons.delete,
-                                      color: Colors.white),
-                                  title: Text(
-                                    users[index]['Name'] ??
-                                        'Name not available',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  )),
-                ),
-              ),
-            ],
-          ),
-        ));
+          );
+        },
+      ),
+    );
   }
 }
