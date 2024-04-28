@@ -46,7 +46,7 @@ class _All_DoctorState extends State<All_Doctor> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(top: 70, left: 120),
-                child: Text('All Doctor',
+                child: Text('Doctors',
                     style: TextStyle(color: Colors.white, fontSize: 30)),
               ),
               Padding(

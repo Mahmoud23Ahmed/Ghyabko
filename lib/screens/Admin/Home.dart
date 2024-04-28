@@ -98,7 +98,7 @@ class Home extends StatelessWidget {
                         size: 50,
                       ),
                       Text(
-                        'Add Subject',
+                        'Subject',
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       context,
@@ -131,7 +131,7 @@ class Home extends StatelessWidget {
                         size: 50,
                       ),
                       Text(
-                        'All Student',
+                        'Student',
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       context,
@@ -144,7 +144,7 @@ class Home extends StatelessWidget {
                         size: 50,
                       ),
                       Text(
-                        'All Doctors',
+                        'Doctors',
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       context,
