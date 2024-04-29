@@ -32,6 +32,7 @@ dependencies:
   get: ^4.6.6
   excel: ^4.0.3
   file_picker: 8.0.0+1
+  firebase_admin: ^0.2.0
 
 dev_dependencies:
   flutter_test:

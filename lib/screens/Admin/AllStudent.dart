@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ghyabko/screens/Admin/editeStudent.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:ghyabko/screens/Admin/editeUser.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +49,7 @@ class _All_StudentState extends State<All_Student> {
             crossAxisCount: 2, mainAxisExtent: 160),
         itemBuilder: (context, i) {
           return InkWell(
-            onLongPress: () {
+            onTap: () {
               AwesomeDialog(
                 context: context,
                 dialogType: DialogType.warning,
@@ -59,13 +60,31 @@ class _All_StudentState extends State<All_Student> {
                 btnCancelText: 'Edit',
                 btnCancelOnPress: () {
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditeStudent(
+                      builder: (context) => EditeUser(
                           id: data[i].id,
                           oldname: data[i]['Name'],
                           oldemile: data[i]['Email'],
                           oldPassword: data[i]['Password'])));
                 },
                 btnOkOnPress: () async {
+                  FirebaseAuth auth = FirebaseAuth.instance;
+                  AuthCredential credential = EmailAuthProvider.credential(
+                    email: data[i]['Email'],
+                    password: data[i]['Password'],
+                  );
+                  auth.signInWithCredential(credential).then((userCredential) {
+                    User? user = userCredential.user;
+                    if (user != null) {
+                      user.delete().then((_) {
+                        print('User deleted successfully');
+                      }).catchError((error) {
+                        print('Error deleting user: $error');
+                      });
+                    }
+                  }).catchError((error) {
+                    print('Error updating email: $error');
+                  });
+
                   await FirebaseFirestore.instance
                       .collection('Users')
                       .doc(data[i].id)
