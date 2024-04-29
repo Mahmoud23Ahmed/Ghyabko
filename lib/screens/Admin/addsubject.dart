@@ -1,6 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
+import 'package:ghyabko/screens/Admin/addsubbutton.dart';
 import 'package:ghyabko/screens/Admin/editSubject.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +48,8 @@ class _AddsubjectState extends State<Addsubject> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: constColor,
         onPressed: () {
-          Navigator.of(context).pushReplacementNamed("AddSubjectButton");
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => AddSubjectButton()));
         },
         child: const Icon(
           Icons.add,

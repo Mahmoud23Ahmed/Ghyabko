@@ -3,11 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddSubjectButton extends StatefulWidget {
-  final String subjectID;
-
   const AddSubjectButton({
     Key? key,
-    required this.subjectID,
   }) : super(key: key);
 
   @override
@@ -23,14 +20,6 @@ class _AddStudentState extends State<AddSubjectButton> {
   TextEditingController emailController = TextEditingController();
 
   TextEditingController nameController = TextEditingController();
-
-  String id = '';
-
-  getstudent() async {
-    QuerySnapshot querySnapshot =
-        await subject.doc(widget.subjectID).collection('student').get();
-    data.addAll(querySnapshot.docs);
-  }
 
   addsubject() async {
     setState(() {});
