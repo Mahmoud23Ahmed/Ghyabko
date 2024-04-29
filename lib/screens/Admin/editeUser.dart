@@ -88,7 +88,7 @@ class _AddStudentState extends State<EditeUser> {
               const SizedBox(
                 height: 60,
               ),
-              const Text('Edit Student',
+              const Text('Edit Users',
                   style: TextStyle(color: Colors.white, fontSize: 40)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
