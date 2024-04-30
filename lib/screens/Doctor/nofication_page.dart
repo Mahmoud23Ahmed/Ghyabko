@@ -1,3 +1,4 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:ghyabko/api/Notification_api.dart';
 import 'package:ghyabko/model/Notifiction_Model.dart';
@@ -135,14 +136,28 @@ class _NotifyState extends State<Notify> {
                     backgroundColor: constColor,
                   ),
                   onPressed: () {
-                    if (formKey.currentState!.validate()) {
-                      final Notification = NotificationModel(
-                          Message: 'Attendace',
-                          LecName: "0",
-                          date: DateTime.now().toString(),
-                          subjectName: widget.subjectName);
-                      Notificationapi.instance.addNotification(Notification);
-                    }
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.question,
+                      animType: AnimType.leftSlide,
+                      title: 'You want to take Attendance now ?',
+                      btnCancelText: 'Yes',
+                      btnOkText: 'No',
+                      btnOkOnPress: () {
+                        Navigator.pop(context);
+                      },
+                      btnCancelOnPress: () async {
+                        if (formKey.currentState!.validate()) {
+                          final Notification = NotificationModel(
+                              Message: 'Attendace',
+                              LecName: "0",
+                              date: DateTime.now().toString(),
+                              subjectName: widget.subjectName);
+                          Notificationapi.instance
+                              .addNotification(Notification);
+                        }
+                      },
+                    ).show();
                   },
                   icon: Icon(
                     Icons.notification_add_rounded,

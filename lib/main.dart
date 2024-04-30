@@ -1,9 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ghyabko/screens/Admin/AllStudent.dart';
 import 'package:ghyabko/screens/Admin/All_Doctor.dart';
-
 import 'package:ghyabko/screens/Admin/addsubject.dart';
-
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';

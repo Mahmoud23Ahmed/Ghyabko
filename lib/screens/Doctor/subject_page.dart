@@ -63,7 +63,7 @@ class _SubjectNameState extends State<SubjectName> {
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            DoctorPage(subjectid: data[i].id)));
+                            DoctorPage(subjectid: data[i]['subname'])));
                   },
                   child: Card(
                     child: Container(
