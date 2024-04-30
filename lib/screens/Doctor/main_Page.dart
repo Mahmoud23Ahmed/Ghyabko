@@ -6,10 +6,10 @@ import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
 class DoctorPage extends StatefulWidget {
-  final String subjectID;
+  final String subjectName;
   DoctorPage({
     Key? key,
-    required this.subjectID,
+    required this.subjectName,
   }) : super(key: key);
 
   @override
@@ -49,7 +49,7 @@ class _DoctorPageState extends State<DoctorPage> {
 
   Future<void> fetchName() async {
     try {
-      String? name = await getNameById(widget.subjectID);
+      String? name = await getNameById(widget.subjectName);
       setState(() {
         appBarTitle = name ?? 'Default Name';
       });
@@ -92,7 +92,7 @@ class _DoctorPageState extends State<DoctorPage> {
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: ((context) {
-                    return Notify(subjectID: widget.subjectID);
+                    return Notify(subjectName: widget.subjectName);
                   })));
                 },
                 child: const Text(

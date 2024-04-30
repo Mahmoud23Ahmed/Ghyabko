@@ -1,65 +1,32 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
-class EditeUser extends StatefulWidget {
-  final String id;
-  final String oldname;
-  final String oldemile;
-  final String oldPassword;
-  const EditeUser(
-      {super.key,
-      required this.id,
-      required this.oldname,
-      required this.oldemile,
-      required this.oldPassword});
+class AddSubjectButton extends StatefulWidget {
+  const AddSubjectButton({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<EditeUser> createState() => _AddStudentState();
+  State<AddSubjectButton> createState() => _AddStudentState();
 }
 
-class _AddStudentState extends State<EditeUser> {
-  CollectionReference student = FirebaseFirestore.instance.collection('Users');
+class _AddStudentState extends State<AddSubjectButton> {
+  List<QueryDocumentSnapshot> data = [];
+  // GlobalKey<FormState> formstate = GlobalKey<FormState>();
+  CollectionReference subject =
+      FirebaseFirestore.instance.collection('subject');
 
   TextEditingController emailController = TextEditingController();
 
   TextEditingController nameController = TextEditingController();
 
-  TextEditingController PasswordController = TextEditingController();
-
-  Future<void> editUser(String newPassword) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    AuthCredential credential = EmailAuthProvider.credential(
-      email: widget.oldemile,
-      password: widget.oldPassword,
-    );
-    auth.signInWithCredential(credential).then((userCredential) {
-      User? user = userCredential.user;
-      if (user != null) {
-        user.updatePassword(newPassword).then((_) {
-          print('Password updated successfully');
-        }).catchError((error) {
-          print('Error updating password: $error');
-        });
-      } else {
-        print('Error: User object is null');
-      }
-    }).catchError((error) {
-      print('Error signing in user: $error');
-    });
-    await student.doc(widget.id).update({
-      'Name': nameController.text,
-      'Password': newPassword,
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    nameController.text = widget.oldname;
-    emailController.text = widget.oldemile;
-    PasswordController.text = widget.oldPassword;
+  addsubject() async {
+    setState(() {});
+    await subject.add(
+        {'subname': nameController.text, 'docemail': emailController.text});
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil("Addsubject", (route) => false);
   }
 
   Widget build(BuildContext context) {
@@ -73,6 +40,15 @@ class _AddStudentState extends State<EditeUser> {
         elevation: 0.0,
       ),
       extendBodyBehindAppBar: true,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: constColor,
+        onPressed: () {},
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+          size: 35,
+        ),
+      ),
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -88,8 +64,8 @@ class _AddStudentState extends State<EditeUser> {
               const SizedBox(
                 height: 60,
               ),
-              const Text('Edit Users',
-                  style: TextStyle(color: Colors.white, fontSize: 40)),
+              const Text('ADD Doctor to Subject',
+                  style: TextStyle(color: Colors.white, fontSize: 30)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
@@ -98,22 +74,6 @@ class _AddStudentState extends State<EditeUser> {
                   width: 190,
                 ),
               ),
-              Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "UserName: " + nameController.text,
-                    style: TextStyle(fontSize: 25),
-                  )),
-              Container(
-                  margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
-                  padding: const EdgeInsets.only(left: 20, right: 20),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Email :" + emailController.text,
-                    style: TextStyle(fontSize: 25),
-                  )),
               Container(
                 margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
                 padding: const EdgeInsets.only(left: 20, right: 20),
@@ -130,13 +90,44 @@ class _AddStudentState extends State<EditeUser> {
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
-                  controller: PasswordController,
+                  controller: nameController,
                   decoration: InputDecoration(
                     icon: Icon(
-                      Icons.password_outlined,
+                      Icons.subject,
                       color: Colors.white,
                     ),
-                    hintText: "Enter Password",
+                    hintText: "Enter Subject name",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: constColor,
+                  boxShadow: const [
+                    BoxShadow(
+                      offset: Offset(0, 10),
+                      blurRadius: 50,
+                      color: Colors.white,
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    ),
+                    hintText: "Enter Doctor Email",
                     hintStyle: TextStyle(
                       color: Colors.white,
                     ),
@@ -151,11 +142,11 @@ class _AddStudentState extends State<EditeUser> {
                   color: constColor,
                   borderRadius: BorderRadius.circular(10),
                   child: MaterialButton(
-                    onPressed: () => {editUser(PasswordController.text)},
+                    onPressed: () => {addsubject()},
                     minWidth: 140,
                     height: 60,
                     child: const Text(
-                      'Save',
+                      'Add',
                       style: TextStyle(
                         fontSize: 22.5,
                         color: Colors.white,

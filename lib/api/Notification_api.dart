@@ -16,7 +16,7 @@ class Notificationapi extends GetxController {
           'Message': notificationModel.Message,
           'LecName': notificationModel.LecName,
           'Date': notificationModel.date,
-          'Subjectid': notificationModel.subjectid,
+          'SubjectName': notificationModel.subjectName,
         });
       } catch (e) {
         print("Error adding user: $e");

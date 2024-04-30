@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghyabko/screens/Doctor/main_Page.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
@@ -14,10 +15,17 @@ class _SubjectNameState extends State<SubjectName> {
   List<QueryDocumentSnapshot> data = [];
 
   bool isloading = true;
+  late String docEmail;
 
   getsubject() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('subject').get();
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      docEmail = user.email!;
+    }
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('subject')
+        .where('docemail', isEqualTo: docEmail)
+        .get();
     data.addAll(querySnapshot.docs);
     isloading = false;
   }
@@ -55,7 +63,7 @@ class _SubjectNameState extends State<SubjectName> {
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) =>
-                            DoctorPage(subjectID: data[i].id)));
+                            DoctorPage(subjectName: data[i]['subname'])));
                   },
                   child: Card(
                     child: Container(

@@ -5,10 +5,10 @@ import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
 class Notify extends StatefulWidget {
-  final String subjectID;
+  final String subjectName;
   Notify({
     Key? key,
-    required this.subjectID,
+    required this.subjectName,
   }) : super(key: key);
 
   @override
@@ -103,7 +103,7 @@ class _NotifyState extends State<Notify> {
                     Message: MessageController.text.trim(),
                     LecName: "0",
                     date: DateTime.now().toString(),
-                    subjectid: widget.subjectID);
+                    subjectName: widget.subjectName);
                 Notificationapi.instance.addNotification(Notification);
               }
             },

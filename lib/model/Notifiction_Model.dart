@@ -3,14 +3,14 @@ class NotificationModel {
   final String Message;
   final String LecName;
   final String date;
-  final String subjectid;
+  final String subjectName;
 
   const NotificationModel({
     this.id,
     required this.Message,
     required this.LecName,
     required this.date,
-    required this.subjectid,
+    required this.subjectName,
   });
 
   toJson() {
@@ -18,7 +18,7 @@ class NotificationModel {
       "Message": Message,
       "LecName": LecName,
       "date": date,
-      "subjectid": subjectid,
+      "subjectName": subjectName,
     };
   }
 }

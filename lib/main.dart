@@ -28,7 +28,6 @@ class MyApp extends StatelessWidget {
         'Addsubject': (context) => Addsubject(),
         'All_Student': (context) => All_Student(),
         'All_Doctor': (context) => All_Doctor(),
-        //'AddSubjectButton': (context) => AddSubjectButton(title: 'addsubject'),
       },
       initialRoute: 'LoginPage',
     );
