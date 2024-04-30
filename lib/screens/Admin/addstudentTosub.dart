@@ -180,6 +180,35 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                   ),
                 ],
               ),
+              SizedBox(width: 60),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: constColor,
+                ),
+                onPressed: () async {
+                  var snapshots = await FirebaseFirestore.instance
+                      .collection('subject')
+                      .doc(widget.subjectID)
+                      .collection('student')
+                      .get();
+
+                  for (var doc in snapshots.docs) {
+                    await doc.reference.delete();
+                  }
+                },
+                icon: Icon(
+                  Icons.delete,
+                  size: 24,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'delete',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
             ],
           ),
         ),

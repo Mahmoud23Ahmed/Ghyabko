@@ -1,7 +1,7 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
-import 'package:ghyabko/screens/Admin/addDocToSub.dart';
+import 'package:ghyabko/screens/Admin/addsubbutton.dart';
 import 'package:ghyabko/screens/Admin/editSubject.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
