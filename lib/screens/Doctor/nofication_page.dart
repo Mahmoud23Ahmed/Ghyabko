@@ -96,35 +96,66 @@ class _NotifyState extends State<Notify> {
           const SizedBox(
             height: 50,
           ),
-          GestureDetector(
-            onTap: () {
-              if (formKey.currentState!.validate()) {
-                final Notification = NotificationModel(
-                    Message: MessageController.text.trim(),
-                    LecName: "0",
-                    date: DateTime.now().toString(),
-                    subjectName: widget.subjectName);
-                Notificationapi.instance.addNotification(Notification);
-              }
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10, left: 50, right: 50),
-              child: Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-                child: const Center(
-                  child: Text('Send',
-                      style: TextStyle(
-                        color: constColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      )),
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  if (formKey.currentState!.validate()) {
+                    final Notification = NotificationModel(
+                        Message: MessageController.text.trim(),
+                        LecName: "0",
+                        date: DateTime.now().toString(),
+                        subjectName: widget.subjectName);
+                    Notificationapi.instance.addNotification(Notification);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 50, right: 50),
+                  child: Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Center(
+                      child: Text('Send',
+                          style: TextStyle(
+                            color: constColor,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          )),
+                    ),
+                  ),
                 ),
               ),
-            ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: constColor,
+                ),
+                onPressed: () {
+                  if (formKey.currentState!.validate()) {
+                    final Notification = NotificationModel(
+                        Message: 'Attendace',
+                        LecName: "0",
+                        date: DateTime.now().toString(),
+                        subjectName: widget.subjectName);
+                    Notificationapi.instance.addNotification(Notification);
+                  }
+                },
+                icon: Icon(
+                  Icons.notification_add_rounded,
+                  size: 24,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'Attendace',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ],
           ),
         ]),
       ),
