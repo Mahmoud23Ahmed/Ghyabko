@@ -17,6 +17,7 @@ class Notify extends StatefulWidget {
 }
 
 class _NotifyState extends State<Notify> {
+  int selectedNumber = 1;
   final Notification_data = Get.put(Notificationapi());
 
   @override
@@ -37,7 +38,7 @@ class _NotifyState extends State<Notify> {
       body: SingleChildScrollView(
         child: Column(children: [
           const SizedBox(
-            height: 100,
+            height: 50,
           ),
           const Row(
             children: [
@@ -63,10 +64,31 @@ class _NotifyState extends State<Notify> {
             ],
           ),
           const SizedBox(
-            height: 50,
+            height: 70,
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 50),
+            padding: const EdgeInsets.only(left: 20),
+            child: Row(
+              children: [
+                Text(
+                  'Select Lec Number   :    ',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                  ),
+                ),
+                buildNumberDropdown(onChanged: (int? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedNumber = newValue;
+                    });
+                  }
+                }),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 20),
             child: TextFormField(
               controller: MessageController,
               style: const TextStyle(
@@ -109,7 +131,7 @@ class _NotifyState extends State<Notify> {
                     if (formKey.currentState!.validate()) {
                       final Notification = NotificationModel(
                           Message: MessageController.text.trim(),
-                          LecName: "0",
+                          LecName: selectedNumber.toString(),
                           date: DateTime.now().toString(),
                           subjectName: widget.subjectName);
                       Notificationapi.instance.addNotification(Notification);
@@ -150,7 +172,7 @@ class _NotifyState extends State<Notify> {
                         if (formKey.currentState!.validate()) {
                           final Notification = NotificationModel(
                               Message: 'Attendace',
-                              LecName: "0",
+                              LecName: selectedNumber.toString(),
                               date: DateTime.now().toString(),
                               subjectName: widget.subjectName);
                           Notificationapi.instance
@@ -176,6 +198,21 @@ class _NotifyState extends State<Notify> {
             ),
           ),
         ]),
+      ),
+    );
+  }
+
+  DropdownButton<int> buildNumberDropdown(
+      {required ValueChanged<int?> onChanged}) {
+    return DropdownButton<int>(
+      value: selectedNumber,
+      onChanged: onChanged,
+      items: List.generate(
+        12,
+        (index) => DropdownMenuItem<int>(
+          value: index + 1,
+          child: Text((index + 1).toString()),
+        ),
       ),
     );
   }

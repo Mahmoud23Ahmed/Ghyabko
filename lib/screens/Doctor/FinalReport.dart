@@ -1,30 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:ghyabko/screens/Doctor/main_Page.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
+import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
-class SubjectName extends StatefulWidget {
-  SubjectName({super.key});
+class FinalReport extends StatefulWidget {
+  const FinalReport({super.key});
 
   @override
-  State<SubjectName> createState() => _SubjectNameState();
+  State<FinalReport> createState() => _FinalReportState();
 }
 
-class _SubjectNameState extends State<SubjectName> {
+class _FinalReportState extends State<FinalReport> {
   List<QueryDocumentSnapshot> data = [];
 
   bool isloading = true;
-  late String docEmail;
+  late String LecName;
 
   getsubject() async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      docEmail = user.email!;
-    }
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('subject')
-        .where('docemail', isEqualTo: docEmail)
+        .collection('Notification')
+        .where('LecName', isEqualTo: LecName)
         .get();
     data.addAll(querySnapshot.docs);
     isloading = false;
@@ -42,7 +36,7 @@ class _SubjectNameState extends State<SubjectName> {
       appBar: AppBar(
         backgroundColor: constColor,
         title: Text(
-          'Your Subjects',
+          'Final Report',
           style: const TextStyle(
               fontFamily: 'LibreBaskerville',
               fontSize: 23,
@@ -60,13 +54,7 @@ class _SubjectNameState extends State<SubjectName> {
                   crossAxisCount: 2, mainAxisExtent: 160),
               itemBuilder: (context, i) {
                 return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => MainPage(
-                              subjectid: data[i].id,
-                              subjectName: data[i]['subname'],
-                            )));
-                  },
+                  onTap: () {},
                   child: Card(
                     child: Container(
                       padding: EdgeInsets.all(10),
@@ -76,7 +64,7 @@ class _SubjectNameState extends State<SubjectName> {
                             "assets/subLogo.png",
                             height: 100,
                           ),
-                          Text("${data[i]['subname']}"),
+                          Text("${data[i]['LecName']}"),
                         ],
                       ),
                     ),

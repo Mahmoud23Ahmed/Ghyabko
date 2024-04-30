@@ -1,22 +1,26 @@
 // ignore_for_file: file_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ghyabko/screens/Doctor/AttendanceList.dart';
+import 'package:ghyabko/screens/Doctor/FinalReport.dart';
 import 'package:ghyabko/screens/Doctor/nofication_page.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
-class DoctorPage extends StatefulWidget {
+class MainPage extends StatefulWidget {
+  final String subjectName;
   final String subjectid;
-  DoctorPage({
+  MainPage({
     Key? key,
+    required this.subjectName,
     required this.subjectid,
   }) : super(key: key);
 
   @override
-  State<DoctorPage> createState() => _DoctorPageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _DoctorPageState extends State<DoctorPage> {
+class _MainPageState extends State<MainPage> {
   String appBarTitle = 'Loading...';
 
   @override
@@ -92,7 +96,7 @@ class _DoctorPageState extends State<DoctorPage> {
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: ((context) {
-                    return Notify(subjectName: widget.subjectid);
+                    return Notify(subjectName: widget.subjectName);
                   })));
                 },
                 child: const Text(
@@ -112,7 +116,11 @@ class _DoctorPageState extends State<DoctorPage> {
                   fontSize: 25,
                   fontWeight: FontWeight.normal,
                 )),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: ((context) {
+                return attendaceList();
+              })));
+            },
             child: const Text(
               'Attendacne List',
               style: TextStyle(color: Colors.white),
@@ -128,7 +136,11 @@ class _DoctorPageState extends State<DoctorPage> {
                       borderRadius: BorderRadius.circular(20)),
                   textStyle: const TextStyle(
                       fontSize: 25, fontWeight: FontWeight.normal)),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: ((context) {
+                  return FinalReport();
+                })));
+              },
               child: const Text(
                 'final Report',
                 style: TextStyle(color: Colors.white),
