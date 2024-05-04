@@ -15,13 +15,6 @@ class userapi extends GetxController {
           email: user.Email,
           password: user.Password,
         );
-        // Upload image to Firebase Storage
-        // String imageFileName = DateTime.now().millisecondsSinceEpoch.toString();
-        // Reference storageReference = FirebaseStorage.instance.ref().child('user_images/$imageFileName.jpg');
-        // await storageReference.putFile(image);
-
-        // Get the download URL for the image
-        // String imageUrl = await storageReference.getDownloadURL();
 
         // Add user data to Firestore
         await FirebaseFirestore.instance
@@ -31,8 +24,8 @@ class userapi extends GetxController {
           'Name': user.Name,
           'Email': user.Email,
           'Password': user.Password,
-          'Image_url': "null",
           'Type': user.Type,
+          'Subjects': user.subjects,
         });
       } catch (e) {
         print("Error adding user: $e");

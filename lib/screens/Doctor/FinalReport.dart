@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class FinalReport extends StatefulWidget {
-  const FinalReport({super.key});
+  final String subjectName;
+  const FinalReport({Key? key, required this.subjectName}) : super(key: key);
 
   @override
   State<FinalReport> createState() => _FinalReportState();
@@ -11,22 +12,24 @@ class FinalReport extends StatefulWidget {
 
 class _FinalReportState extends State<FinalReport> {
   List<QueryDocumentSnapshot> data = [];
-
   bool isloading = true;
   late String LecName;
 
-  getsubject() async {
+  Future<void> Final_Report() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Notification')
-        .where('LecName', isEqualTo: LecName)
+        .collection('Final_Report')
+        .where('SubjectName', isEqualTo: widget.subjectName)
         .get();
-    data.addAll(querySnapshot.docs);
-    isloading = false;
+
+    setState(() {
+      data.addAll(querySnapshot.docs);
+      isloading = false;
+    });
   }
 
   @override
   void initState() {
-    getsubject();
+    Final_Report();
     super.initState();
   }
 
@@ -44,33 +47,74 @@ class _FinalReportState extends State<FinalReport> {
         ),
       ),
       extendBodyBehindAppBar: true,
-      body: isloading == true
+      body: isloading
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : GridView.builder(
-              itemCount: data.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
-              itemBuilder: (context, i) {
-                return InkWell(
-                  onTap: () {},
-                  child: Card(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/subLogo.png",
-                            height: 100,
-                          ),
-                          Text("${data[i]['LecName']}"),
-                        ],
-                      ),
+          : Padding(
+              padding: const EdgeInsets.only(top: 80),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    color: Colors.grey[200],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Student Name',
+                          style: TextStyle(
+                              fontFamily: 'LibreBaskerville',
+                              fontSize: 18,
+                              color: Colors.grey[800]),
+                        ),
+                        Text(
+                          'Email',
+                          style: TextStyle(
+                              fontFamily: 'LibreBaskerville',
+                              fontSize: 18,
+                              color: Colors.grey[800]),
+                        ),
+                        Text(
+                          'Attendance',
+                          style: TextStyle(
+                              fontFamily: 'LibreBaskerville',
+                              fontSize: 18,
+                              color: Colors.grey[800]),
+                        ),
+                      ],
                     ),
                   ),
-                );
-              },
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: data.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return GestureDetector(
+                        onTap: () {},
+                        child: ListTile(
+                          title: Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child:
+                                    Text("${data[index]["userName"]}       "),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text("   ${data[index]["Email"]}"),
+                              ),
+                            ],
+                          ),
+                          trailing: Text(
+                            "${data[index]["AttendanceNum"].toString()}",
+                            style: TextStyle(fontSize: 15),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
     );
   }

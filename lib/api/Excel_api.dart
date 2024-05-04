@@ -29,8 +29,8 @@ class excelapi extends GetxController {
             'Name': name,
             'Email': email,
             'Password': password,
-            'Image_url': null,
             'Type': Type,
+            'Subjects': null,
           });
           try {
             await FirebaseAuth.instance.createUserWithEmailAndPassword(

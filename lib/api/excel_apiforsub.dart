@@ -18,18 +18,49 @@ class excelapiforsub extends GetxController {
       var excel = Excel.decodeBytes(File(file.path!).readAsBytesSync());
       for (var table in excel.tables.keys) {
         for (var row in excel.tables[table]!.rows) {
-          //  String name = row[0] != null ? _extractName(row[0]!.toString()) : '';
-          String email = row[0] != null ? extractEmail(row[0]!.toString()) : '';
+          String email = row[1] != null ? extractEmail(row[1]!.toString()) : '';
 
-          // Store data in Firestore
           CollectionReference student = FirebaseFirestore.instance
               .collection('subject')
               .doc(subjectID)
               .collection('student');
-          DocumentReference response = await student.add({
+          await student.add({
             'studentemail': email,
-            //'studentname': name,
           });
+
+          try {
+            DocumentSnapshot subjectSnapshot = await FirebaseFirestore.instance
+                .collection('subject')
+                .doc(subjectID)
+                .get();
+            Map<String, dynamic>? data =
+                subjectSnapshot.data() as Map<String, dynamic>?;
+            String? subjectName = data?['subname'];
+            QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+                .collection('Users')
+                .where('Email', isEqualTo: email)
+                .get();
+
+            if (querySnapshot.docs.isNotEmpty) {
+              String userId = querySnapshot.docs.first.id;
+
+              List<String> existingSubjects =
+                  List<String>.from(querySnapshot.docs.first['Subjects'] ?? []);
+
+              existingSubjects.add(subjectName!);
+
+              await FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(userId)
+                  .update({
+                'Subjects': FieldValue.arrayUnion([subjectName])
+              });
+            } else {
+              print('User with email $email not found');
+            }
+          } catch (e) {
+            print("Error updating subjects: $e");
+          }
         }
       }
     }
@@ -39,19 +70,5 @@ class excelapiforsub extends GetxController {
     RegExp regex = RegExp(r'([a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+.[a-zA-Z0-9-]+)');
     String? email = regex.stringMatch(data)?.trim();
     return email ?? '';
-  }
-
-  String _extractName(String data) {
-    int startIndex = data.indexOf('(') + 1;
-    int endIndex = data.indexOf(',', startIndex);
-    String name = data.substring(startIndex, endIndex).trim();
-    return name;
-  }
-
-  String _extractPassword(String data) {
-    int startIndex = data.indexOf('(') + 1;
-    int endIndex = data.indexOf(',', startIndex);
-    String password = data.substring(startIndex, endIndex).trim();
-    return password;
   }
 }

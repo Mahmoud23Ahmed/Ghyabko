@@ -1,97 +1,64 @@
-import 'package:ghyabko/helper/Student_helper/subjectcalss.dart';
-import 'package:ghyabko/screens/Student/add_subject.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghyabko/screens/Student/notification_Screen.dart';
 import 'package:ghyabko/screens/Student/profile.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
-import '../../helper/Student_helper/subWidgetsForSubject.dart';
 
 const constColor = Color(0xFF6469d9);
 
 // ignore: must_be_immutable
-class YourSubject extends StatelessWidget {
-  YourSubject({super.key});
-  List<Subject> subjects = [
-    Subject(text: 'Math-3'),
-    Subject(text: 'Algorithm'),
-    Subject(text: 'Embedded System'),
-    Subject(text: 'Operatin System-1'),
-    Subject(text: 'Parallel Programming'),
-  ];
+class YourSubject extends StatefulWidget {
+  const YourSubject({super.key});
+  @override
+  State<YourSubject> createState() => _YourSubjectState();
+}
+
+class _YourSubjectState extends State<YourSubject> {
+  List<String> subjectList = [];
+
+  bool isloading = true;
+
+  late String StuEmail;
+
+  getsubject() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      StuEmail = user.email!;
+    }
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('Email', isEqualTo: StuEmail)
+        .get();
+    DocumentSnapshot userSnapshot = querySnapshot.docs.first;
+    List<dynamic> subjects = userSnapshot.get('Subjects');
+    subjectList = subjects.map((subject) => subject.toString()).toList();
+    isloading = false;
+  }
+
+  @override
+  void initState() {
+    getsubject();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 2,
-        selectedItemColor: constColor,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.addchart_sharp,
-              color: constColor,
-            ),
-            label: ("Add Subject"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.notifications_active_outlined,
-              color: constColor,
-            ),
-            label: ("Notification"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.subject_outlined,
-              color: constColor,
-            ),
-            label: ("Your Subject"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-              color: constColor,
-            ),
-            label: "Profile",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.logout,
-              color: constColor,
-            ),
-            label: "Logout",
-          ),
-        ],
-        onTap: (value) {
-          if (value == 0) {
-            Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return Addsubject();
-            })));
-          }
-          if (value == 1) {
-            Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return NotificatePage();
-            })));
-          }
-          if (value == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return YourSubject();
-            })));
-          }
-          if (value == 3) {
-            Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return const StudentPage();
-            })));
-          }
-          if (value == 4) {
-            Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return LoginPage();
-            })));
-          }
-        },
-      ),
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: <Widget>[
+          IconButton(
+              icon: const Icon(Icons.person, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (context) => Profile()));
+              })
+        ],
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF6469d9),
         title: const Text(
@@ -99,19 +66,39 @@ class YourSubject extends StatelessWidget {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: ListView(children: [
-          Items(subject: subjects[0]),
-          Items(subject: subjects[1]),
-          Items(subject: subjects[2]),
-          Items(subject: subjects[3]),
-          Items(subject: subjects[4]),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 160, vertical: 50),
-          )
-        ]),
-      ),
+      body: isloading == true
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : GridView.builder(
+              itemCount: subjectList.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, mainAxisExtent: 160),
+              itemBuilder: (context, i) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => NotificatePage(
+                              subjectName: subjectList[i],
+                            )));
+                  },
+                  child: Card(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Image.asset(
+                            "assets/subLogo.png",
+                            height: 100,
+                          ),
+                          Text("${subjectList[i]}"),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

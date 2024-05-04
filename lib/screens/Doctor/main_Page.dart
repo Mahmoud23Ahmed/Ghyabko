@@ -118,7 +118,8 @@ class _MainPageState extends State<MainPage> {
                 )),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: ((context) {
-                return attendaceList();
+                return FirebaseStorageFileListScreen(
+                    subName: widget.subjectName);
               })));
             },
             child: const Text(
@@ -138,7 +139,9 @@ class _MainPageState extends State<MainPage> {
                       fontSize: 25, fontWeight: FontWeight.normal)),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: ((context) {
-                  return FinalReport();
+                  return FinalReport(
+                    subjectName: widget.subjectName,
+                  );
                 })));
               },
               child: const Text(

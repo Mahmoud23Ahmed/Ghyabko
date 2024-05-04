@@ -3,16 +3,16 @@ class UserModel {
   final String Name;
   final String Email;
   final String Password;
-  final String? ImgProf;
   final String Type;
+  final List<String>? subjects;
 
   const UserModel({
     this.id,
     required this.Email,
     required this.Name,
     required this.Password,
-    this.ImgProf,
     required this.Type,
+    this.subjects,
   });
 
   toJson() {
@@ -20,8 +20,8 @@ class UserModel {
       "Name": Name,
       "Email": Email,
       "password": Password,
-      "imgeProf": ImgProf,
-      "Type": Type
+      "Type": Type,
+      "subjects": subjects,
     };
   }
 }

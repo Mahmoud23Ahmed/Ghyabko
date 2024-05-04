@@ -1,17 +1,16 @@
-// ignore_for_file: unused_local_variable
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:ghyabko/api/excel_apiforsub.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddstudentTOsubject extends StatefulWidget {
   final String subjectID;
+  final String subjectName;
   const AddstudentTOsubject({
     Key? key,
     required this.subjectID,
+    required this.subjectName,
   }) : super(key: key);
 
   @override
@@ -21,13 +20,66 @@ class AddstudentTOsubject extends StatefulWidget {
 class _AddStudentState extends State<AddstudentTOsubject> {
   List<QueryDocumentSnapshot> data = [];
   final excel_api = Get.put(excelapiforsub());
+  Future<void> AddSubjectsToStudent(String email, String newSubject) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('Email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+
+        List<String> existingSubjects =
+            List<String>.from(querySnapshot.docs.first['Subjects'] ?? []);
+
+        existingSubjects.add(newSubject);
+
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(userId)
+            .update({
+          'Subjects': FieldValue.arrayUnion([newSubject])
+        });
+      } else {
+        print('User with email $email not found');
+      }
+    } catch (e) {
+      print("Error updating subjects: $e");
+    }
+  }
+
+  Future<void> deleteSubjectFromStudent(
+      String email, String subjectToDelete) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('Email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String userId = querySnapshot.docs.first.id;
+
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(userId)
+            .update({
+          'Subjects': FieldValue.arrayRemove([subjectToDelete])
+        });
+      } else {
+        print('User with email $email not found');
+      }
+    } catch (e) {
+      print("Error deleting subject: $e");
+    }
+  }
+
   addstudent() async {
     CollectionReference student = FirebaseFirestore.instance
         .collection('subject')
         .doc(widget.subjectID)
         .collection('student');
-    DocumentReference response = await student.add(
-        {'studentemail': studentemail.text, 'studentname': studentname.text});
+    await student.add({'studentemail': studentemail.text});
   }
 
   TextEditingController studentemail = TextEditingController();
@@ -84,37 +136,6 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
-                  controller: studentname,
-                  decoration: InputDecoration(
-                    icon: Icon(
-                      Icons.subject,
-                      color: Colors.white,
-                    ),
-                    hintText: "Enter student name",
-                    hintStyle: TextStyle(
-                      color: Colors.white,
-                    ),
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                  ),
-                ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: constColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 50,
-                      color: Colors.white,
-                    )
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: TextFormField(
                   controller: studentemail,
                   decoration: InputDecoration(
                     icon: Icon(
@@ -142,6 +163,8 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                     ),
                     onPressed: () {
                       addstudent();
+                      AddSubjectsToStudent(
+                          studentemail.text, widget.subjectName);
                     },
                     icon: Icon(
                       Icons.add,
@@ -195,6 +218,8 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                   for (var doc in snapshots.docs) {
                     await doc.reference.delete();
                   }
+                  deleteSubjectFromStudent(
+                      studentemail.text, widget.subjectName);
                 },
                 icon: Icon(
                   Icons.delete,
