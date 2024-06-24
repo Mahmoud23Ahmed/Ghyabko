@@ -1,4 +1,10 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.your_package_name">
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application
         android:label="ghyabko"
         android:name="${applicationName}"
@@ -26,8 +32,15 @@
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
-        <meta-data
+       <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+       <!-- Insert queries here -->
     </application>
+    <queries>
+           <intent>
+               <action android:name="android.intent.action.SENDTO" />
+               <data android:scheme="mailto" />
+           </intent>
+       </queries>
 </manifest>
