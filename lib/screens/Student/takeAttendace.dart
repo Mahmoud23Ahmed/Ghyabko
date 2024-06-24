@@ -6,18 +6,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class TakeAttendace extends StatefulWidget {
   final String LecName;
   final String LecNum;
 
-  const TakeAttendace({super.key, required this.LecName, required this.LecNum});
+  const TakeAttendace({Key? key, required this.LecName, required this.LecNum})
+      : super(key: key);
+
   @override
   _TakeAttendaceState createState() => _TakeAttendaceState();
 }
 
 class _TakeAttendaceState extends State<TakeAttendace> {
-  List<String> loggedEmails = [];
+  List<String> loggedNames = [];
   String? excelFileURL;
   bool isUploading = false;
 
@@ -30,18 +33,24 @@ class _TakeAttendaceState extends State<TakeAttendace> {
   Future<void> startListeningAuthState() async {
     await Firebase.initializeApp();
 
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user != null) {
-        String userEmail = user.email!;
-        logEmail(userEmail);
+        var userDoc = await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.uid)
+            .get();
+        var name = userDoc['Name'];
+        String username = name;
+        print(username);
+        logName(username);
       }
     });
   }
 
-  void logEmail(String email) {
-    if (!loggedEmails.contains(email)) {
+  void logName(String name) {
+    if (!loggedNames.contains(name)) {
       setState(() {
-        loggedEmails.add(email);
+        loggedNames.add(name);
       });
       saveAndUploadToFirebase();
     }
@@ -53,15 +62,14 @@ class _TakeAttendaceState extends State<TakeAttendace> {
         isUploading = true;
       });
 
-      List<String> existingEmails = await getExistingEmailsFromStorage();
+      List<String> existingNames = await getExistingNamesFromStorage();
 
-      List<String> newEmails = loggedEmails
-          .where((email) => !existingEmails.contains(email))
-          .toList();
+      List<String> newNames =
+          loggedNames.where((name) => !existingNames.contains(name)).toList();
 
-      existingEmails.addAll(newEmails);
+      existingNames.addAll(newNames);
 
-      List<int> excelFile = generateExcelFile(existingEmails);
+      List<int> excelFile = generateExcelFile(existingNames);
 
       excelFileURL = await uploadToFirebaseStorage(excelFile);
 
@@ -73,7 +81,7 @@ class _TakeAttendaceState extends State<TakeAttendace> {
     }
   }
 
-  Future<List<String>> getExistingEmailsFromStorage() async {
+  Future<List<String>> getExistingNamesFromStorage() async {
     final storage = FirebaseStorage.instance;
     String subName = widget.LecName;
     String lecNum = widget.LecNum;
@@ -86,19 +94,22 @@ class _TakeAttendaceState extends State<TakeAttendace> {
 
       String excelData = utf8.decode(downloadData!);
 
-      List<String> existingEmails = excelData.split('\n');
+      List<String> existingNames = excelData.split('\n');
 
-      existingEmails.removeWhere((element) => element.isEmpty);
-      return existingEmails;
+      existingNames.removeWhere((element) => element.isEmpty);
+      return existingNames;
     } catch (e) {
-      print('Error retrieving existing emails: $e');
+      print('Error retrieving existing names: $e');
       return [];
     }
   }
 
-  List<int> generateExcelFile(List<String> emails) {
-    String excelData = emails.join('\n');
-    return utf8.encode(excelData);
+  List<int> generateExcelFile(List<String> names) {
+    String excelData = names.join('\n');
+    // Use Utf8Encoder and manually add BOM
+    var encoder = const Utf8Encoder();
+    List<int> bom = [0xEF, 0xBB, 0xBF];
+    return [...bom, ...encoder.convert(excelData)];
   }
 
   Future<String> uploadToFirebaseStorage(List<int> excelFile) async {
@@ -110,7 +121,12 @@ class _TakeAttendaceState extends State<TakeAttendace> {
 
     final ref = storage.ref().child('$subName$lecNum.csv');
 
-    final uploadTask = ref.putData(excelDataUint8);
+    // Specify the character encoding when uploading the file
+    final uploadTask = ref.putData(
+        excelDataUint8,
+        SettableMetadata(
+          contentType: 'text/csv; charset=utf-8',
+        ));
 
     await uploadTask.whenComplete(() => print('File uploaded successfully'));
 
@@ -181,13 +197,42 @@ class _TakeAttendaceState extends State<TakeAttendace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text("Done"),
-        ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: EdgeInsets.only(top: 50),
+            child: Image(
+              image: AssetImage('assets/ok.png'),
+              height: 300,
+              width: 300,
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 50),
+            child: Text('Attendance has been registered successfully',
+                style: TextStyle(
+                    fontSize: 20,
+                    color: constColor,
+                    fontWeight: FontWeight.bold)),
+          ),
+          SizedBox(
+            height: 50,
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: constColor),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "Done",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }

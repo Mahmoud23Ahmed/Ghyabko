@@ -2,16 +2,27 @@
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+// import 'package:get/get_core/src/get_main.dart';
+
+//import 'package:permission_handler/permission_handler.dart';
+
 import 'package:ghyabko/screens/Student/TakeAttendace.dart';
 import 'package:ghyabko/screens/Student/profile.dart';
-import 'package:flutter/material.dart';
+import 'package:ghyabko/screens/conest/location.dart';
 
 const constColor = Color(0xFF6469d9);
 
 // ignore: must_be_immutable
 class NotificatePage extends StatefulWidget {
   final String subjectName;
-  NotificatePage({super.key, required this.subjectName});
+
+  NotificatePage({
+    Key? key,
+    required this.subjectName,
+  }) : super(key: key);
 
   @override
   State<NotificatePage> createState() => _NotificatePageState();
@@ -19,6 +30,8 @@ class NotificatePage extends StatefulWidget {
 
 class _NotificatePageState extends State<NotificatePage> {
   List<QueryDocumentSnapshot> data = [];
+  double distanceInMeters = 0;
+  final location = Get.put(locaion());
 
   bool isloading = true;
   getNotification() async {
@@ -26,8 +39,10 @@ class _NotificatePageState extends State<NotificatePage> {
         .collection('Notification')
         .where('SubjectName', isEqualTo: widget.subjectName)
         .get();
-    data.addAll(querySnapshot.docs);
-    isloading = false;
+    setState(() {
+      data.addAll(querySnapshot.docs);
+      isloading = false;
+    });
   }
 
   @override
@@ -67,8 +82,21 @@ class _NotificatePageState extends State<NotificatePage> {
               itemCount: data.length,
               itemBuilder: (BuildContext context, int index) {
                 return GestureDetector(
-                  onTap: () {
-                    if (data[index]['Message'] == 'Attendace') {
+                  onTap: () async {
+                    print(
+                        'Distance to other location: $distanceInMeters meters');
+                    Position currentPosition =
+                        await Geolocator.getCurrentPosition(
+                      desiredAccuracy: LocationAccuracy.high,
+                    );
+                    distanceInMeters = await Geolocator.distanceBetween(
+                      currentPosition.latitude,
+                      currentPosition.longitude,
+                      double.parse(data[index]['locationLatitude']),
+                      double.parse(data[index]['locationLongitude']),
+                    );
+                    if (data[index]['Message'] == 'Attendance' &&
+                        distanceInMeters <= 70) {
                       AwesomeDialog(
                         context: context,
                         dialogType: DialogType.question,

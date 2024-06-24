@@ -1,60 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:ghyabko/api/user_api.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
+import 'package:get/get.dart';
 
-class AddSubjectToDoc extends StatefulWidget {
-  const AddSubjectToDoc({
+class AddSubjectButton extends StatefulWidget {
+  const AddSubjectButton({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<AddSubjectToDoc> createState() => _AddStudentState();
+  State<AddSubjectButton> createState() => _AddStudentState();
 }
 
-class _AddStudentState extends State<AddSubjectToDoc> {
+class _AddStudentState extends State<AddSubjectButton> {
   List<QueryDocumentSnapshot> data = [];
+  // GlobalKey<FormState> formstate = GlobalKey<FormState>();
   CollectionReference subject =
       FirebaseFirestore.instance.collection('subject');
 
   TextEditingController emailController = TextEditingController();
-
   TextEditingController nameController = TextEditingController();
-
-  Future<void> AddSubjectsToDoc(String email, String newSubject) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .where('Email', isEqualTo: email)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        String userId = querySnapshot.docs.first.id;
-
-        List<String> existingSubjects =
-            List<String>.from(querySnapshot.docs.first['Subjects'] ?? []);
-
-        existingSubjects.add(newSubject);
-
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(userId)
-            .update({
-          'Subjects': FieldValue.arrayUnion([newSubject])
-        });
-      } else {
-        print('User with email $email not found');
-      }
-    } catch (e) {
-      print("Error updating subjects: $e");
-    }
-  }
+  final user_data = Get.put(userapi());
 
   addsubject() async {
     setState(() {});
     await subject.add(
         {'subname': nameController.text, 'docemail': emailController.text});
     Navigator.of(context)
-        .pushNamedAndRemoveUntil("Addsubject", (route) => true);
+        .pushNamedAndRemoveUntil("Addsubject", (route) => false);
   }
 
   Widget build(BuildContext context) {
@@ -169,25 +143,15 @@ class _AddStudentState extends State<AddSubjectToDoc> {
                 child: Material(
                   color: constColor,
                   borderRadius: BorderRadius.circular(10),
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: constColor,
-                    ),
-                    onPressed: () {
-                      AddSubjectsToDoc(
-                          emailController.text, nameController.text);
-                      addsubject();
-                    },
-                    icon: Icon(
-                      Icons.add,
-                      size: 24,
-                      color: Colors.white,
-                    ),
-                    label: Text(
+                  child: MaterialButton(
+                    onPressed: () => {addsubject()},
+                    minWidth: 140,
+                    height: 60,
+                    child: const Text(
                       'Add',
                       style: TextStyle(
+                        fontSize: 22.5,
                         color: Colors.white,
-                        fontSize: 20,
                       ),
                     ),
                   ),

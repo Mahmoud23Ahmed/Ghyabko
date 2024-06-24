@@ -1,5 +1,4 @@
 // ignore_for_file: file_names
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/screens/Doctor/AttendanceList.dart';
 import 'package:ghyabko/screens/Doctor/FinalReport.dart';
@@ -65,6 +64,8 @@ class _MainPageState extends State<MainPage> {
     }
   }
 
+  Color constColor = Color(0xFF6469d9);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +89,11 @@ class _MainPageState extends State<MainPage> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: constColor,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 30),
+                        vertical: 14, horizontal: 30),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     textStyle: const TextStyle(
-                        fontSize: 25, fontWeight: FontWeight.normal)),
+                        fontSize: 30, fontWeight: FontWeight.normal)),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: ((context) {
@@ -109,17 +110,16 @@ class _MainPageState extends State<MainPage> {
             style: ElevatedButton.styleFrom(
                 backgroundColor: constColor,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 33),
+                    const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 textStyle: const TextStyle(
-                  fontSize: 25,
+                  fontSize: 30,
                   fontWeight: FontWeight.normal,
                 )),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: ((context) {
-                return FirebaseStorageFileListScreen(
-                    subName: widget.subjectName);
+                return AttendanceList(subName: widget.subjectName);
               })));
             },
             child: const Text(
@@ -132,11 +132,11 @@ class _MainPageState extends State<MainPage> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: constColor,
                   padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 56),
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 70),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                   textStyle: const TextStyle(
-                      fontSize: 25, fontWeight: FontWeight.normal)),
+                      fontSize: 30, fontWeight: FontWeight.normal)),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: ((context) {
                   return FinalReport(

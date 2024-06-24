@@ -76,12 +76,7 @@ class _AddStudentState extends State<EditeUser> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -89,11 +84,11 @@ class _AddStudentState extends State<EditeUser> {
                 height: 60,
               ),
               const Text('Edit Users',
-                  style: TextStyle(color: Colors.white, fontSize: 40)),
+                  style: TextStyle(color: constColor, fontSize: 40)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
-                  image: AssetImage('assets/student.png'),
+                  image: AssetImage('assets/user.png'),
                   height: 170,
                   width: 190,
                 ),
@@ -104,7 +99,7 @@ class _AddStudentState extends State<EditeUser> {
                   alignment: Alignment.center,
                   child: Text(
                     "UserName: " + nameController.text,
-                    style: TextStyle(fontSize: 25),
+                    style: TextStyle(fontSize: 25, color: constColor),
                   )),
               Container(
                   margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
@@ -112,7 +107,7 @@ class _AddStudentState extends State<EditeUser> {
                   alignment: Alignment.center,
                   child: Text(
                     "Email :" + emailController.text,
-                    style: TextStyle(fontSize: 25),
+                    style: TextStyle(fontSize: 25, color: constColor),
                   )),
               Container(
                 margin: const EdgeInsets.only(left: 20, right: 20, top: 25),

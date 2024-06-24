@@ -1,7 +1,11 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import 'package:ghyabko/api/excel_apiforsub.dart';
+import 'package:ghyabko/api/user_api.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddstudentTOsubject extends StatefulWidget {
@@ -20,90 +24,33 @@ class AddstudentTOsubject extends StatefulWidget {
 class _AddStudentState extends State<AddstudentTOsubject> {
   List<QueryDocumentSnapshot> data = [];
   final excel_api = Get.put(excelapiforsub());
-  Future<void> AddSubjectsToStudent(String email, String newSubject) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .where('Email', isEqualTo: email)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        String userId = querySnapshot.docs.first.id;
-
-        List<String> existingSubjects =
-            List<String>.from(querySnapshot.docs.first['Subjects'] ?? []);
-
-        existingSubjects.add(newSubject);
-
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(userId)
-            .update({
-          'Subjects': FieldValue.arrayUnion([newSubject])
-        });
-      } else {
-        print('User with email $email not found');
-      }
-    } catch (e) {
-      print("Error updating subjects: $e");
-    }
-  }
-
-  Future<void> deleteSubjectFromStudent(
-      String email, String subjectToDelete) async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .where('Email', isEqualTo: email)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        String userId = querySnapshot.docs.first.id;
-
-        await FirebaseFirestore.instance
-            .collection('Users')
-            .doc(userId)
-            .update({
-          'Subjects': FieldValue.arrayRemove([subjectToDelete])
-        });
-      } else {
-        print('User with email $email not found');
-      }
-    } catch (e) {
-      print("Error deleting subject: $e");
-    }
-  }
-
+  final user_data = Get.put(userapi());
   addstudent() async {
-    CollectionReference student = FirebaseFirestore.instance
-        .collection('subject')
-        .doc(widget.subjectID)
-        .collection('student');
-    await student.add({'studentemail': studentemail.text});
+    userapi.instance.addSubjectToUser(studentemail.text, widget.subjectName);
   }
 
   TextEditingController studentemail = TextEditingController();
   TextEditingController studentname = TextEditingController();
+  final nameNumController = TextEditingController();
+  final emailNumController = TextEditingController();
+  final PasswordNumController = TextEditingController();
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          '',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.transparent,
+        title: Text(widget.subjectName,
+            style: const TextStyle(
+                fontFamily: 'LibreBaskerville',
+                fontSize: 23,
+                color: Colors.white)),
+        backgroundColor: constColor,
         elevation: 0.0,
       ),
       extendBodyBehindAppBar: true,
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -111,11 +58,11 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                 height: 60,
               ),
               const Text('ADD Student To Subject',
-                  style: TextStyle(color: Colors.white, fontSize: 25)),
+                  style: TextStyle(color: constColor, fontSize: 25)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
-                  image: AssetImage('assets/student.png'),
+                  image: AssetImage('assets/student3.png'),
                   height: 170,
                   width: 190,
                 ),
@@ -126,13 +73,30 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   color: constColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 50,
+                ),
+                alignment: Alignment.center,
+                child: TextFormField(
+                  controller: studentname,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.subject,
                       color: Colors.white,
-                    )
-                  ],
+                    ),
+                    hintText: "Enter student name",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: constColor,
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
@@ -163,8 +127,8 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                     ),
                     onPressed: () {
                       addstudent();
-                      AddSubjectsToStudent(
-                          studentemail.text, widget.subjectName);
+                      userapi.instance.addSubjectToUser(
+                          widget.subjectName, studentemail.text);
                     },
                     icon: Icon(
                       Icons.add,
@@ -185,8 +149,61 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                       backgroundColor: constColor,
                     ),
                     onPressed: () {
-                      excelapiforsub.instance
-                          .pickFileAndUploadExel(widget.subjectID);
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'Enter the number of columns in Excel',
+                              style: TextStyle(color: constColor),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Email Column   ',
+                                      style: TextStyle(color: constColor),
+                                    ),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: emailNumController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: const Text('Submit'),
+                                onPressed: () {
+                                  int emailColumn =
+                                      int.tryParse(emailNumController.text) ??
+                                          0;
+
+                                  excelapiforsub.instance.pickFileAndUploadExel(
+                                      widget.subjectID,
+                                      widget.subjectName,
+                                      emailColumn,
+                                      studentemail.text);
+
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     icon: Icon(
                       Icons.upload_file_rounded,
@@ -194,7 +211,101 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                       color: Colors.white,
                     ),
                     label: Text(
-                      'Upload Excel File',
+                      'Add Students Excel File',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                    ),
+                    onPressed: () async {
+                      userapi.instance.deleteSubjectFromUserByEmail(
+                          studentemail.text, widget.subjectName);
+                    },
+                    icon: Icon(
+                      Icons.delete,
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'delete',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                    ),
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text(
+                              'Enter the number of columns in Excel',
+                              style: TextStyle(color: constColor),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Email Column   ',
+                                      style: TextStyle(color: constColor),
+                                    ),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: emailNumController,
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: const Text('Submit'),
+                                onPressed: () {
+                                  int emailColumn =
+                                      int.tryParse(emailNumController.text) ??
+                                          0;
+                                  excel_api.deleteSubjectFromUsersInExcel(
+                                      widget.subjectID,
+                                      widget.subjectName,
+                                      emailColumn);
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    icon: Icon(
+                      Icons.delete,
+                      size: 24,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'delete Students excel',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -202,37 +313,6 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                     ),
                   ),
                 ],
-              ),
-              SizedBox(width: 60),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: constColor,
-                ),
-                onPressed: () async {
-                  var snapshots = await FirebaseFirestore.instance
-                      .collection('subject')
-                      .doc(widget.subjectID)
-                      .collection('student')
-                      .get();
-
-                  for (var doc in snapshots.docs) {
-                    await doc.reference.delete();
-                  }
-                  deleteSubjectFromStudent(
-                      studentemail.text, widget.subjectName);
-                },
-                icon: Icon(
-                  Icons.delete,
-                  size: 24,
-                  color: Colors.white,
-                ),
-                label: Text(
-                  'delete',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                  ),
-                ),
               ),
             ],
           ),

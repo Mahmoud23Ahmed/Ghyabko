@@ -67,12 +67,7 @@ class _AddStudentState extends State<EditeSubjectButton> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -80,11 +75,11 @@ class _AddStudentState extends State<EditeSubjectButton> {
                 height: 60,
               ),
               const Text('Edit Subject',
-                  style: TextStyle(color: Colors.white, fontSize: 40)),
+                  style: TextStyle(color: constColor, fontSize: 40)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
-                  image: AssetImage('assets/student.png'),
+                  image: AssetImage('assets/subicon2.png'),
                   height: 170,
                   width: 190,
                 ),
@@ -95,13 +90,6 @@ class _AddStudentState extends State<EditeSubjectButton> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   color: constColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 50,
-                      color: Colors.white,
-                    )
-                  ],
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(
@@ -126,13 +114,6 @@ class _AddStudentState extends State<EditeSubjectButton> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(50),
                   color: constColor,
-                  boxShadow: const [
-                    BoxShadow(
-                      offset: Offset(0, 10),
-                      blurRadius: 50,
-                      color: Colors.white,
-                    )
-                  ],
                 ),
                 alignment: Alignment.center,
                 child: TextFormField(

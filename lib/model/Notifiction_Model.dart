@@ -4,6 +4,8 @@ class NotificationModel {
   final String LecName;
   final String date;
   final String subjectName;
+  final String locationLatitude;
+  final String locationLongitude;
 
   const NotificationModel({
     this.id,
@@ -11,6 +13,8 @@ class NotificationModel {
     required this.LecName,
     required this.date,
     required this.subjectName,
+    required this.locationLatitude,
+    required this.locationLongitude,
   });
 
   toJson() {
@@ -19,6 +23,8 @@ class NotificationModel {
       "LecName": LecName,
       "date": date,
       "subjectName": subjectName,
+      "locationLatitude": locationLatitude,
+      "locationLongitud": locationLongitude,
     };
   }
 }

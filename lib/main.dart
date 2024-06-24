@@ -1,13 +1,18 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:ghyabko/screens/Admin/AllStudent.dart';
 import 'package:ghyabko/screens/Admin/All_Doctor.dart';
-import 'package:ghyabko/screens/Admin/addsubject.dart';
+import 'package:ghyabko/screens/Admin/AllSubjects.dart';
+import 'package:ghyabko/screens/login/login.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 late Size mq;
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  FlutterDownloader.initialize(
+    debug: true, // Set to false in production
+  );
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -22,7 +27,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: {
-        'LoginPage': (context) => LoginPage(),
+        'LoginPage': (context) => login(),
         'Addsubject': (context) => Addsubject(),
         'All_Student': (context) => All_Student(),
         'All_Doctor': (context) => All_Doctor(),

@@ -1,32 +1,34 @@
+import 'dart:typed_data';
+
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
+import 'package:flutter_email_sender/flutter_email_sender.dart';
+import 'package:mailer/mailer.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
-class FirebaseStorageFileListScreen extends StatefulWidget {
+const constColor = Color(0xFF6469d9);
+
+class AttendanceList extends StatefulWidget {
   final String subName;
 
-  const FirebaseStorageFileListScreen({Key? key, required this.subName})
-      : super(key: key);
+  const AttendanceList({Key? key, required this.subName}) : super(key: key);
 
   @override
-  _FirebaseStorageFileListScreenState createState() =>
-      _FirebaseStorageFileListScreenState();
+  _AttendanceListState createState() => _AttendanceListState();
 }
 
-class _FirebaseStorageFileListScreenState
-    extends State<FirebaseStorageFileListScreen> {
+class _AttendanceListState extends State<AttendanceList> {
   List<firebase_storage.Reference> _fileList = [];
 
   @override
   void initState() {
     super.initState();
-    initializeDownloader();
     _getFileList();
-  }
-
-  Future<void> initializeDownloader() async {
-    await FlutterDownloader.initialize(debug: true);
   }
 
   Future<void> _getFileList() async {
@@ -45,30 +47,75 @@ class _FirebaseStorageFileListScreenState
     }
   }
 
-  Future<void> _downloadExcelFile(String subName) async {
+  Future<void> _downloadExcelFile(firebase_storage.Reference fileRef) async {
     try {
-      firebase_storage.Reference? excelFile;
-      for (var file in _fileList) {
-        if (file.name.contains(widget.subName) && file.name.endsWith('.csv')) {
-          excelFile = file;
-          break;
-        }
-      }
-      if (excelFile == null) {
-        print('Excel file not found for subName: $subName');
+      if (!fileRef.name.endsWith('.csv')) {
+        print('Selected file is not an Excel file.');
         return;
       }
 
-      String url = await excelFile.getDownloadURL();
+      String url = await fileRef.getDownloadURL();
       final taskId = await FlutterDownloader.enqueue(
         url: url,
         savedDir: '/storage/emulated/0/Download/',
         showNotification: true,
         openFileFromNotification: true,
+        saveInPublicStorage:
+            true, // Set this to true to save the file in public storage
       );
       print('Download task id: $taskId');
     } catch (e) {
       print('Error downloading file: $e');
+    }
+  }
+
+  Future<void> _sendExcelToEmail(firebase_storage.Reference fileRef) async {
+    try {
+      final User? user = FirebaseAuth.instance.currentUser;
+      final String? email = user?.email;
+
+      if (email == null) {
+        // Handle the case when the user is not logged in
+        print("User not logged in or email not available");
+        return;
+      }
+      if (!fileRef.name.endsWith('.csv')) {
+        print('Selected file is not a CSV file.');
+        return;
+      }
+
+      // Get the download URL for the file
+      final String url = await fileRef.getDownloadURL();
+
+      // Fetch the file data
+      final http.Response response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final List<int> fileBytes = response.bodyBytes;
+
+        // Convert bytes to Uint8List
+        final Uint8List uint8List = Uint8List.fromList(fileBytes);
+
+        // Create a temporary file to attach
+        final tempDir = await getTemporaryDirectory();
+        final tempFile = File('${tempDir.path}/${fileRef.name}');
+        await tempFile.writeAsBytes(fileBytes);
+
+        // Create an email with the attachment
+        final Email emailToSend = Email(
+          body: 'Please find the attendance list attached.',
+          subject: 'Attendance List - ${fileRef.name}',
+          recipients: [email], // Replace with the recipient's email
+          attachmentPaths: [tempFile.path],
+          isHTML: false,
+        );
+
+        // Send the email
+        await FlutterEmailSender.send(emailToSend);
+      } else {
+        print('Error downloading file: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error sending email: $e');
     }
   }
 
@@ -96,7 +143,21 @@ class _FirebaseStorageFileListScreenState
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
-                    _downloadExcelFile(widget.subName);
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.warning,
+                      animType: AnimType.rightSlide,
+                      title: 'Download or Send To your Email',
+                      desc: 'Choose what you want to do',
+                      btnOkText: 'Download',
+                      btnCancelText: 'Send To Email',
+                      btnCancelOnPress: () {
+                        _sendExcelToEmail(_fileList[index]);
+                      },
+                      btnOkOnPress: () async {
+                        _downloadExcelFile(_fileList[index]);
+                      },
+                    ).show();
                   },
                   child: Card(
                     child: Container(

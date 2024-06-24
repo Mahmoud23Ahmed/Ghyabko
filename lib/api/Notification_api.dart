@@ -17,6 +17,8 @@ class Notificationapi extends GetxController {
           'LecName': notificationModel.LecName,
           'Date': notificationModel.date,
           'SubjectName': notificationModel.subjectName,
+          'locationLatitude': notificationModel.locationLatitude,
+          'locationLongitude': notificationModel.locationLongitude
         });
       } catch (e) {
         print("Error adding user: $e");

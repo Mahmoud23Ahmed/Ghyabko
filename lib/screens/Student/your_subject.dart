@@ -32,8 +32,10 @@ class _YourSubjectState extends State<YourSubject> {
         .get();
     DocumentSnapshot userSnapshot = querySnapshot.docs.first;
     List<dynamic> subjects = userSnapshot.get('Subjects');
-    subjectList = subjects.map((subject) => subject.toString()).toList();
-    isloading = false;
+    setState(() {
+      subjectList = subjects.map((subject) => subject.toString()).toList();
+      isloading = false;
+    });
   }
 
   @override
@@ -88,7 +90,7 @@ class _YourSubjectState extends State<YourSubject> {
                       child: Column(
                         children: [
                           Image.asset(
-                            "assets/subLogo.png",
+                            "assets/subjecticon.png",
                             height: 100,
                           ),
                           Text("${subjectList[i]}"),

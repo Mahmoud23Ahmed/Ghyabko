@@ -14,6 +14,9 @@ class _DoctorState extends State<Doctor> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final PasswordController = TextEditingController();
+  final nameNumController = TextEditingController();
+  final emailNumController = TextEditingController();
+  final PasswordNumController = TextEditingController();
 
   final user_data = Get.put(userapi());
   final excel_api = Get.put(excelapi());
@@ -33,12 +36,7 @@ class _DoctorState extends State<Doctor> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/bg.jpg'),
-            fit: BoxFit.fill,
-          ),
-        ),
+        decoration: const BoxDecoration(color: Colors.white),
         child: SingleChildScrollView(
           child: Form(
             key: formKey,
@@ -48,7 +46,7 @@ class _DoctorState extends State<Doctor> {
                   height: 60,
                 ),
                 const Text('ADD Doctor',
-                    style: TextStyle(color: Colors.white, fontSize: 40)),
+                    style: TextStyle(color: constColor, fontSize: 40)),
                 const Padding(
                   padding: EdgeInsets.only(top: 80),
                   child: Image(
@@ -63,13 +61,6 @@ class _DoctorState extends State<Doctor> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
                     color: constColor,
-                    boxShadow: const [
-                      BoxShadow(
-                        offset: Offset(0, 10),
-                        blurRadius: 50,
-                        color: Colors.white,
-                      )
-                    ],
                   ),
                   alignment: Alignment.center,
                   child: TextFormField(
@@ -94,13 +85,6 @@ class _DoctorState extends State<Doctor> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
                     color: constColor,
-                    boxShadow: const [
-                      BoxShadow(
-                        offset: Offset(0, 10),
-                        blurRadius: 50,
-                        color: Colors.white,
-                      )
-                    ],
                   ),
                   alignment: Alignment.center,
                   child: TextFormField(
@@ -125,13 +109,6 @@ class _DoctorState extends State<Doctor> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
                     color: constColor,
-                    boxShadow: const [
-                      BoxShadow(
-                        offset: Offset(0, 10),
-                        blurRadius: 50,
-                        color: Colors.white,
-                      )
-                    ],
                   ),
                   alignment: Alignment.center,
                   child: TextFormField(
@@ -189,7 +166,97 @@ class _DoctorState extends State<Doctor> {
                         backgroundColor: constColor,
                       ),
                       onPressed: () {
-                        excelapi.instance.pickFileAndUploadExel('Doctor');
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text(
+                                'Enter the number of columns in Excel',
+                                style: TextStyle(color: constColor),
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Name Column   ',
+                                        style: TextStyle(color: constColor),
+                                      ),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: nameNumController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Email Column   ',
+                                        style: TextStyle(color: constColor),
+                                      ),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: emailNumController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Password Column   ',
+                                        style: TextStyle(color: constColor),
+                                      ),
+                                      Expanded(
+                                        child: TextField(
+                                          controller: PasswordNumController,
+                                          keyboardType: TextInputType.number,
+                                          decoration: InputDecoration(),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: const Text('Cancel'),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                                TextButton(
+                                  child: const Text('Submit'),
+                                  onPressed: () {
+                                    int nameColumn =
+                                        int.tryParse(nameNumController.text) ??
+                                            0;
+                                    int emailColumn =
+                                        int.tryParse(emailNumController.text) ??
+                                            0;
+                                    int passwordColumn = int.tryParse(
+                                            PasswordNumController.text) ??
+                                        0;
+
+                                    excelapi.instance.pickFileAndUploadExel(
+                                      'Doctor',
+                                      nameColumn,
+                                      emailColumn,
+                                      passwordColumn,
+                                    );
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
                       },
                       icon: Icon(
                         Icons.upload_file_rounded,

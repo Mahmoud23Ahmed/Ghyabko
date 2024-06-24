@@ -1,121 +1,150 @@
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ghyabko/screens/Admin/addDocToSub.dart';
-import 'package:ghyabko/screens/Admin/addstudentTosub.dart';
-import 'package:ghyabko/screens/Admin/editSubject.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
+import 'package:ghyabko/api/user_api.dart';
+import 'package:ghyabko/screens/auth/Login_Screen.dart';
+import 'package:get/get.dart';
 
-class Addsubject extends StatefulWidget {
-  const Addsubject({super.key});
+class AddSubjectButton extends StatefulWidget {
+  const AddSubjectButton({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<Addsubject> createState() => _AddsubjectState();
+  State<AddSubjectButton> createState() => _AddStudentState();
 }
 
-class _AddsubjectState extends State<Addsubject> {
+class _AddStudentState extends State<AddSubjectButton> {
   List<QueryDocumentSnapshot> data = [];
+  // GlobalKey<FormState> formstate = GlobalKey<FormState>();
+  CollectionReference subject =
+      FirebaseFirestore.instance.collection('subject');
 
-  bool isloading = true;
+  TextEditingController emailController = TextEditingController();
 
-  getsubject() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection('subject').get();
-    data.addAll(querySnapshot.docs);
-    isloading = false;
+  TextEditingController nameController = TextEditingController();
+  final user_data = Get.put(userapi());
+
+  addsubject() async {
+    userapi.instance
+        .addSubjectToUser(emailController.text, nameController.text);
+    setState(() {});
+    await subject.add(
+        {'subname': nameController.text, 'docemail': emailController.text});
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil("Addsubject", (route) => false);
   }
 
-  @override
-  void initState() {
-    getsubject();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: constColor,
-        title: Text(
-          'Subjects',
-          style: const TextStyle(
-              fontFamily: 'LibreBaskerville',
-              fontSize: 23,
-              color: Colors.white),
+        title: const Text(
+          '',
+          style: TextStyle(color: Colors.black),
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
       ),
       extendBodyBehindAppBar: true,
       floatingActionButton: FloatingActionButton(
         backgroundColor: constColor,
-        onPressed: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (context) => AddSubjectToDoc()));
-        },
+        onPressed: () {},
         child: const Icon(
           Icons.add,
           color: Colors.white,
           size: 35,
         ),
       ),
-      body: isloading == true
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : GridView.builder(
-              itemCount: data.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
-              itemBuilder: (context, i) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => AddstudentTOsubject(
-                            subjectID: data[i].id,
-                            subjectName: data[i]['subname'])));
-                  },
-                  onLongPress: () {
-                    AwesomeDialog(
-                      context: context,
-                      dialogType: DialogType.warning,
-                      animType: AnimType.rightSlide,
-                      title: 'Delete or Edit Subject',
-                      desc: 'choose you went to do',
-                      btnOkText: 'Delete',
-                      btnCancelText: 'Edit',
-                      btnCancelOnPress: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EditeSubjectButton(
-                                id: data[i].id,
-                                oldname: data[i]['subname'],
-                                oldemile: data[i]['docemail'])));
-                      },
-                      btnOkOnPress: () async {
-                        await FirebaseFirestore.instance
-                            .collection('subject')
-                            .doc(data[i].id)
-                            .delete();
-                        Navigator.of(context)
-                            .pushReplacementNamed("Addsubject");
-                      },
-                    ).show();
-                  },
-                  child: Card(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/subLogo.png",
-                            height: 100,
-                          ),
-                          Text("${data[i]['subname']}"),
-                        ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: const BoxDecoration(color: Colors.white),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 60,
+              ),
+              const Text('ADD Subject',
+                  style: TextStyle(color: constColor, fontSize: 40)),
+              const Padding(
+                padding: EdgeInsets.only(top: 50),
+                child: Image(
+                  image: AssetImage('assets/subicon.png'),
+                  height: 170,
+                  width: 190,
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: constColor,
+                ),
+                alignment: Alignment.center,
+                child: TextFormField(
+                  controller: nameController,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.subject,
+                      color: Colors.white,
+                    ),
+                    hintText: "Enter Subject name",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 20, right: 20, top: 25),
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: constColor,
+                ),
+                alignment: Alignment.center,
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    icon: Icon(
+                      Icons.email,
+                      color: Colors.white,
+                    ),
+                    hintText: "Enter Doc Email",
+                    hintStyle: TextStyle(
+                      color: Colors.white,
+                    ),
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 25),
+                child: Material(
+                  color: constColor,
+                  borderRadius: BorderRadius.circular(10),
+                  child: MaterialButton(
+                    onPressed: () => {addsubject()},
+                    minWidth: 140,
+                    height: 60,
+                    child: const Text(
+                      'Add',
+                      style: TextStyle(
+                        fontSize: 22.5,
+                        color: Colors.white,
                       ),
                     ),
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

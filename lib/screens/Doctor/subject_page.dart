@@ -26,8 +26,11 @@ class _SubjectNameState extends State<SubjectName> {
         .collection('subject')
         .where('docemail', isEqualTo: docEmail)
         .get();
-    data.addAll(querySnapshot.docs);
-    isloading = false;
+
+    setState(() {
+      data.addAll(querySnapshot.docs);
+      isloading = false;
+    });
   }
 
   @override
@@ -73,7 +76,7 @@ class _SubjectNameState extends State<SubjectName> {
                       child: Column(
                         children: [
                           Image.asset(
-                            "assets/subLogo.png",
+                            "assets/subjecticon.png",
                             height: 100,
                           ),
                           Text("${data[i]['subname']}"),

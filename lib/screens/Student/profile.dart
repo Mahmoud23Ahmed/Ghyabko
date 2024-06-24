@@ -68,53 +68,66 @@ class Profilescreen extends State<Profile> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Positioned(
-          bottom: mq.height * .15,
-          left: mq.width * .05,
-          width: mq.width * .9,
-          height: mq.height * .06,
+        body: SingleChildScrollView(
           child: Stack(children: [
-            SizedBox(
-              width: mq.width,
-              child: Image.asset("assets/bg2.jpg", fit: BoxFit.cover),
+            Positioned(
+              top: 0,
+              left: 0,
+              child: Image.asset(
+                "assets/main_top.png",
+                width: mq.width * 0.4,
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Image.asset(
+                "assets/login_bottom.png",
+                width: mq.width * 0.4,
+              ),
             ),
             const Padding(
-                padding: EdgeInsets.only(top: 100, left: 80),
+                padding: EdgeInsets.only(top: 70, left: 100),
                 child: Text('Welcome',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: constColor,
                       fontSize: 50,
                       fontWeight: FontWeight.bold,
                     ))),
-            const Padding(
-                padding: EdgeInsets.only(top: 500, left: 100),
+            Padding(
+                padding: EdgeInsets.only(top: 200, left: 100),
                 child: Image(
-                    image: AssetImage('assets/logo2.jpg'),
+                    image: AssetImage('assets/logo3.png'),
                     height: 200,
                     fit: BoxFit.fill)),
             Padding(
-              padding: const EdgeInsets.only(top: 250, left: 20, right: 20),
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Text("Name : $_currentUserName",
-                      style: TextStyle(
-                        color: constColor,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      )),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  Text('Email : $_currentUserEmail',
-                      style: TextStyle(
-                        color: constColor,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ],
+              padding: const EdgeInsets.only(top: 400),
+              child: Center(
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    Text("Name : $_currentUserName",
+                        style: TextStyle(
+                          color: constColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text('Email : $_currentUserEmail',
+                        style: TextStyle(
+                          color: constColor,
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    const SizedBox(
+                      height: 230,
+                    ),
+                  ],
+                ),
               ),
             ),
           ]),

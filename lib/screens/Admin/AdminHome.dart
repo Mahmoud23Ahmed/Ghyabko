@@ -1,8 +1,7 @@
 import 'package:ghyabko/helper/Admin_helper/category_item.dart';
-import 'package:ghyabko/screens/Admin/addDoctor.dart';
+import 'package:ghyabko/screens/Admin/AddDoctor.dart';
+import 'package:ghyabko/screens/Admin/AllSubjects.dart';
 import 'package:ghyabko/screens/Admin/addStudent.dart';
-import 'package:ghyabko/screens/Admin/addsubject.dart';
-import 'package:ghyabko/screens/Admin/asignpage.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
@@ -89,15 +88,6 @@ class AdminHome extends StatelessWidget {
               ),
               const SizedBox(
                 height: 60,
-              ),
-              Category(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const Asign_Page();
-                  }));
-                },
-                text: 'Asign Student to Subject',
-                color: constColor,
               ),
             ],
           ),
