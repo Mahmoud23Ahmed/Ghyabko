@@ -3,10 +3,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
+
+const constColor = Color(0xFF6469d9);
 
 class FinalReport extends StatefulWidget {
   final String subjectName;
@@ -165,65 +166,71 @@ class _FinalReportState extends State<FinalReport> {
           ),
         ),
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Builder(
-              builder: (context) {
-                return Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Column(
-                    key: _finalReportKey,
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: data.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {},
-                              child: Card(
-                                margin: const EdgeInsets.symmetric(
-                                    vertical: 8, horizontal: 16),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "${data[index]["userName"]}",
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+      body: Center(
+        child: Container(
+          width: 350, // Fixed width
+          height: 600, // Fixed height
+          child: isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Builder(
+                  builder: (context) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: Column(
+                        key: _finalReportKey,
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return GestureDetector(
+                                  onTap: () {},
+                                  child: Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 16),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "${data[index]["userName"]}",
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                Text("${data[index]["Email"]}"),
+                                              ],
                                             ),
-                                            Text("${data[index]["Email"]}"),
-                                          ],
-                                        ),
+                                          ),
+                                          Text(
+                                            "${data[index]["AttendanceNum"]} | $notificationCount",
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "${data[index]["AttendanceNum"]} | $notificationCount",
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 }

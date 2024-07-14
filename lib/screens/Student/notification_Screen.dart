@@ -5,10 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-// import 'package:get/get_core/src/get_main.dart';
 
-//import 'package:permission_handler/permission_handler.dart';
-
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:ghyabko/screens/Student/TakeAttendace.dart';
 import 'package:ghyabko/screens/Student/profile.dart';
 import 'package:ghyabko/screens/conest/location.dart';
@@ -74,60 +72,66 @@ class _NotificatePageState extends State<NotificatePage> {
         ),
         backgroundColor: const Color(0xFF6469d9),
       ),
-      body: isloading == true
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return GestureDetector(
-                  onTap: () async {
-                    print(
-                        'Distance to other location: $distanceInMeters meters');
-                    Position currentPosition =
-                        await Geolocator.getCurrentPosition(
-                      desiredAccuracy: LocationAccuracy.high,
+      body: Center(
+        child: Container(
+          height: 600, // Set a fixed height
+          width: 350, // Set a fixed width
+          child: isloading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return GestureDetector(
+                      onTap: () async {
+                        print(
+                            'Distance to other location: $distanceInMeters meters');
+                        Position currentPosition =
+                            await Geolocator.getCurrentPosition(
+                          desiredAccuracy: LocationAccuracy.high,
+                        );
+                        distanceInMeters = await Geolocator.distanceBetween(
+                          currentPosition.latitude,
+                          currentPosition.longitude,
+                          double.parse(data[index]['locationLatitude']),
+                          double.parse(data[index]['locationLongitude']),
+                        );
+                        if (data[index]['Message'] == 'Attendance' &&
+                            distanceInMeters <= 700) {
+                          AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.question,
+                            animType: AnimType.rightSlide,
+                            title: 'Want to take your Attendance Please',
+                            desc: 'Are you Agree?',
+                            btnOkText: 'No',
+                            btnCancelText: 'Yes',
+                            btnCancelOnPress: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => TakeAttendace(
+                                        LecName: data[index]['SubjectName'],
+                                        LecNum: data[index]['LecName'],
+                                      )));
+                            },
+                            btnOkOnPress: () async {},
+                          ).show();
+                        }
+                      },
+                      child: ListTile(
+                          leading: const Icon(
+                            Icons.notification_important,
+                            color: constColor,
+                          ),
+                          trailing: Text(
+                            "LecNum:  ${data[index]['LecName']}",
+                            style: TextStyle(color: constColor, fontSize: 15),
+                          ),
+                          title: Text("${data[index]['Message']}")),
                     );
-                    distanceInMeters = await Geolocator.distanceBetween(
-                      currentPosition.latitude,
-                      currentPosition.longitude,
-                      double.parse(data[index]['locationLatitude']),
-                      double.parse(data[index]['locationLongitude']),
-                    );
-                    if (data[index]['Message'] == 'Attendance' &&
-                        distanceInMeters <= 70) {
-                      AwesomeDialog(
-                        context: context,
-                        dialogType: DialogType.question,
-                        animType: AnimType.rightSlide,
-                        title: 'want to take your location Please',
-                        desc: 'Are you Agree ?',
-                        btnOkText: 'No',
-                        btnCancelText: 'Yes',
-                        btnCancelOnPress: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => TakeAttendace(
-                                    LecName: data[index]['SubjectName'],
-                                    LecNum: data[index]['LecName'],
-                                  )));
-                        },
-                        btnOkOnPress: () async {},
-                      ).show();
-                    }
-                  },
-                  child: ListTile(
-                      leading: const Icon(
-                        Icons.notification_important,
-                        color: constColor,
-                      ),
-                      trailing: Text(
-                        "LecNum:  ${data[index]['LecName']}",
-                        style: TextStyle(color: constColor, fontSize: 15),
-                      ),
-                      title: Text("${data[index]['Message']}")),
-                );
-              }),
+                  }),
+        ),
+      ),
     );
   }
 }

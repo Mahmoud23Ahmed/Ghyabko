@@ -197,42 +197,50 @@ class _TakeAttendaceState extends State<TakeAttendace> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 50),
-            child: Image(
-              image: AssetImage('assets/ok.png'),
-              height: 300,
-              width: 300,
-            ),
+      body: Center(
+        child: Container(
+          width: 350, // Fixed width
+          height: 600, // Fixed height
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(top: 50),
+                child: Image(
+                  image: AssetImage('assets/ok.png'),
+                  height: 300,
+                  width: 300,
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 50),
+                child: Text(
+                  'Attendance has been registered successfully',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: constColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: constColor),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  "Done",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          SizedBox(
-            height: 30,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 50),
-            child: Text('Attendance has been registered successfully',
-                style: TextStyle(
-                    fontSize: 20,
-                    color: constColor,
-                    fontWeight: FontWeight.bold)),
-          ),
-          SizedBox(
-            height: 50,
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: constColor),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              "Done",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

@@ -1,9 +1,5 @@
-// ignore_for_file: unused_local_variable
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:ghyabko/api/excel_apiforsub.dart';
 import 'package:ghyabko/api/user_api.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
@@ -11,6 +7,7 @@ import 'package:ghyabko/screens/auth/Login_Screen.dart';
 class AddstudentTOsubject extends StatefulWidget {
   final String subjectID;
   final String subjectName;
+
   const AddstudentTOsubject({
     Key? key,
     required this.subjectID,
@@ -22,27 +19,47 @@ class AddstudentTOsubject extends StatefulWidget {
 }
 
 class _AddStudentState extends State<AddstudentTOsubject> {
-  List<QueryDocumentSnapshot> data = [];
   final excel_api = Get.put(excelapiforsub());
   final user_data = Get.put(userapi());
-  addstudent() async {
-    userapi.instance.addSubjectToUser(studentemail.text, widget.subjectName);
-  }
 
   TextEditingController studentemail = TextEditingController();
   TextEditingController studentname = TextEditingController();
-  final nameNumController = TextEditingController();
   final emailNumController = TextEditingController();
-  final PasswordNumController = TextEditingController();
 
+  void addStudent() async {
+    try {
+      await userapi.instance
+          .addSubjectToUser(studentemail.text, widget.subjectName);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Student added to ${widget.subjectName}'),
+          backgroundColor: Colors.green,
+        ),
+      );
+      studentemail.clear();
+      studentname.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to add student: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.subjectName,
-            style: const TextStyle(
-                fontFamily: 'LibreBaskerville',
-                fontSize: 23,
-                color: Colors.white)),
+        title: Text(
+          widget.subjectName,
+          style: const TextStyle(
+            fontFamily: 'LibreBaskerville',
+            fontSize: 23,
+            color: Colors.white,
+          ),
+        ),
         backgroundColor: constColor,
         elevation: 0.0,
       ),
@@ -54,11 +71,11 @@ class _AddStudentState extends State<AddstudentTOsubject> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(
-                height: 60,
+              const SizedBox(height: 60),
+              const Text(
+                'ADD Student To Subject',
+                style: TextStyle(color: constColor, fontSize: 25),
               ),
-              const Text('ADD Student To Subject',
-                  style: TextStyle(color: constColor, fontSize: 25)),
               const Padding(
                 padding: EdgeInsets.only(top: 50),
                 child: Image(
@@ -115,9 +132,7 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 50,
-              ),
+              SizedBox(height: 50),
               Row(
                 children: [
                   SizedBox(width: 20),
@@ -126,9 +141,7 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                       backgroundColor: constColor,
                     ),
                     onPressed: () {
-                      addstudent();
-                      userapi.instance.addSubjectToUser(
-                          widget.subjectName, studentemail.text);
+                      addStudent();
                     },
                     icon: Icon(
                       Icons.add,
@@ -192,10 +205,11 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                                           0;
 
                                   excelapiforsub.instance.pickFileAndUploadExel(
-                                      widget.subjectID,
-                                      widget.subjectName,
-                                      emailColumn,
-                                      studentemail.text);
+                                    widget.subjectID,
+                                    widget.subjectName,
+                                    emailColumn,
+                                    studentemail.text,
+                                  );
 
                                   Navigator.of(context).pop();
                                 },
@@ -225,7 +239,9 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                     ),
                     onPressed: () async {
                       userapi.instance.deleteSubjectFromUserByEmail(
-                          studentemail.text, widget.subjectName);
+                        studentemail.text,
+                        widget.subjectName,
+                      );
                     },
                     icon: Icon(
                       Icons.delete,
@@ -233,7 +249,7 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                       color: Colors.white,
                     ),
                     label: Text(
-                      'delete',
+                      'Delete',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -288,9 +304,10 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                                       int.tryParse(emailNumController.text) ??
                                           0;
                                   excel_api.deleteSubjectFromUsersInExcel(
-                                      widget.subjectID,
-                                      widget.subjectName,
-                                      emailColumn);
+                                    widget.subjectID,
+                                    widget.subjectName,
+                                    emailColumn,
+                                  );
                                   Navigator.of(context).pop();
                                 },
                               ),
@@ -305,7 +322,7 @@ class _AddStudentState extends State<AddstudentTOsubject> {
                       color: Colors.white,
                     ),
                     label: Text(
-                      'delete Students excel',
+                      'Delete Students Excel',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,

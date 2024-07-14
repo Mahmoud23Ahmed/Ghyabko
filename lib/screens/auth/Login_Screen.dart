@@ -146,7 +146,7 @@ class _LoginPageState extends State<LoginPage> {
                     GestureDetector(
                       onTap: () => Navigator.push(context,
                           MaterialPageRoute(builder: ((context) {
-                        return const OTPscreen();
+                        return OTPscreen();
                       }))),
                       child: const Padding(
                         padding: EdgeInsets.only(left: 100, right: 30),

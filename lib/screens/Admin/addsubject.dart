@@ -1,39 +1,64 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/api/user_api.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:get/get.dart';
+import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
 class AddSubjectButton extends StatefulWidget {
-  const AddSubjectButton({
-    Key? key,
-  }) : super(key: key);
+  const AddSubjectButton({Key? key}) : super(key: key);
 
   @override
-  State<AddSubjectButton> createState() => _AddStudentState();
+  State<AddSubjectButton> createState() => _AddSubjectButtonState();
 }
 
-class _AddStudentState extends State<AddSubjectButton> {
-  List<QueryDocumentSnapshot> data = [];
-  // GlobalKey<FormState> formstate = GlobalKey<FormState>();
-  CollectionReference subject =
+class _AddSubjectButtonState extends State<AddSubjectButton> {
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+
+  final user_data = Get.put(userapi());
+  final CollectionReference subjectCollection =
       FirebaseFirestore.instance.collection('subject');
 
-  TextEditingController emailController = TextEditingController();
+  Future<void> addSubject() async {
+    String docEmail = emailController.text.trim();
+    String subName = nameController.text.trim();
 
-  TextEditingController nameController = TextEditingController();
-  final user_data = Get.put(userapi());
+    // Check if the subject already exists
+    QuerySnapshot querySnapshot =
+        await subjectCollection.where('subname', isEqualTo: subName).get();
 
-  addsubject() async {
-    userapi.instance
-        .addSubjectToUser(emailController.text, nameController.text);
-    setState(() {});
-    await subject.add(
-        {'subname': nameController.text, 'docemail': emailController.text});
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil("Addsubject", (route) => false);
+    if (querySnapshot.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Subject already exists'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Add subject to user data (assuming this function exists in userapi)
+    userapi.instance.addSubjectToUser(docEmail, subName);
+
+    // Add subject to Firestore collection
+    await subjectCollection.add({
+      'subname': subName,
+      'docemail': docEmail,
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Subject added successfully'),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // Clear input fields after successful submission
+    nameController.clear();
+    emailController.clear();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -84,6 +109,12 @@ class _AddStudentState extends State<AddSubjectButton> {
                 alignment: Alignment.center,
                 child: TextFormField(
                   controller: nameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a subject name';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     icon: Icon(
                       Icons.subject,
@@ -108,12 +139,18 @@ class _AddStudentState extends State<AddSubjectButton> {
                 alignment: Alignment.center,
                 child: TextFormField(
                   controller: emailController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter doctor\'s email';
+                    }
+                    return null;
+                  },
                   decoration: InputDecoration(
                     icon: Icon(
                       Icons.email,
                       color: Colors.white,
                     ),
-                    hintText: "Enter Doc Email",
+                    hintText: "Enter Doctor's Email",
                     hintStyle: TextStyle(
                       color: Colors.white,
                     ),
@@ -128,7 +165,19 @@ class _AddStudentState extends State<AddSubjectButton> {
                   color: constColor,
                   borderRadius: BorderRadius.circular(10),
                   child: MaterialButton(
-                    onPressed: () => {addsubject()},
+                    onPressed: () {
+                      if (nameController.text.trim().isEmpty ||
+                          emailController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Please fill all fields'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } else {
+                        addSubject();
+                      }
+                    },
                     minWidth: 140,
                     height: 60,
                     child: const Text(

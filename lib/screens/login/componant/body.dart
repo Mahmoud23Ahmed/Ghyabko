@@ -141,7 +141,7 @@ class _bodyState extends State<body> {
           GestureDetector(
             onTap: () =>
                 Navigator.push(context, MaterialPageRoute(builder: ((context) {
-              return const OTPscreen();
+              return OTPscreen();
             }))),
             child: const Padding(
               padding: EdgeInsets.only(left: 110, right: 30),
@@ -150,7 +150,7 @@ class _bodyState extends State<body> {
                   Text(
                     'Forget Password ?',
                     style: TextStyle(
-                      color: constColor,
+                      color: Color(0xFF6F35A5),
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -211,11 +211,20 @@ class _bodyState extends State<body> {
         }
       } else {
         // User document doesn't exist, handle appropriately
-        print('User data not found');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User Not Found'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     } catch (e) {
-      print("Error logging in: $e");
-      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('User Not Found'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 }

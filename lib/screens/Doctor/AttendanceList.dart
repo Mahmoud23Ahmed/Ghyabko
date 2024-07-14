@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
@@ -7,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:mailer/mailer.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
@@ -92,9 +89,6 @@ class _AttendanceListState extends State<AttendanceList> {
       if (response.statusCode == 200) {
         final List<int> fileBytes = response.bodyBytes;
 
-        // Convert bytes to Uint8List
-        final Uint8List uint8List = Uint8List.fromList(fileBytes);
-
         // Create a temporary file to attach
         final tempDir = await getTemporaryDirectory();
         final tempFile = File('${tempDir.path}/${fileRef.name}');
@@ -132,50 +126,56 @@ class _AttendanceListState extends State<AttendanceList> {
               color: Colors.white),
         ),
       ),
-      body: _fileList.isEmpty
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : GridView.builder(
-              itemCount: _fileList.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
-              itemBuilder: (context, index) {
-                return InkWell(
-                  onTap: () {
-                    AwesomeDialog(
-                      context: context,
-                      dialogType: DialogType.warning,
-                      animType: AnimType.rightSlide,
-                      title: 'Download or Send To your Email',
-                      desc: 'Choose what you want to do',
-                      btnOkText: 'Download',
-                      btnCancelText: 'Send To Email',
-                      btnCancelOnPress: () {
-                        _sendExcelToEmail(_fileList[index]);
+      body: Center(
+        child: Container(
+          width: 350, // Fixed width
+          height: 600, // Fixed height
+          child: _fileList.isEmpty
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : GridView.builder(
+                  itemCount: _fileList.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, mainAxisExtent: 160),
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      onTap: () {
+                        AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.warning,
+                          animType: AnimType.rightSlide,
+                          title: 'Download or Send To your Email',
+                          desc: 'Choose what you want to do',
+                          btnOkText: 'Download',
+                          btnCancelText: 'Send To Email',
+                          btnCancelOnPress: () {
+                            _sendExcelToEmail(_fileList[index]);
+                          },
+                          btnOkOnPress: () async {
+                            _downloadExcelFile(_fileList[index]);
+                          },
+                        ).show();
                       },
-                      btnOkOnPress: () async {
-                        _downloadExcelFile(_fileList[index]);
-                      },
-                    ).show();
-                  },
-                  child: Card(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/excel.png",
-                            height: 100,
+                      child: Card(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                "assets/excel.png",
+                                height: 100,
+                              ),
+                              Text(_fileList[index].name),
+                            ],
                           ),
-                          Text(_fileList[index].name),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 }

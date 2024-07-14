@@ -198,7 +198,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             Center(
                               child: Text(
-                                'welcome Admin to our system you can add doctor or add student or add subject or view all of this ',
+                                'welcome Admin to our system you can add doctor ,student ,subject and Edite or view all of this ',
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),

@@ -1,15 +1,13 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghyabko/api/Excel_api.dart';
 import 'package:ghyabko/screens/Admin/editeUser.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:ghyabko/screens/auth/Login_Screen.dart';
 
-// ignore: camel_case_types
 class All_Doctor extends StatefulWidget {
   const All_Doctor({Key? key}) : super(key: key);
 
@@ -17,12 +15,11 @@ class All_Doctor extends StatefulWidget {
   State<All_Doctor> createState() => _All_DoctorState();
 }
 
-bool isloading = true;
-
 class _All_DoctorState extends State<All_Doctor> {
   List<QueryDocumentSnapshot> data = [];
-  bool isloading = true;
+  bool isLoading = true;
   late StreamSubscription<QuerySnapshot> _subscription;
+  TextEditingController _searchController = TextEditingController();
 
   // Function to initialize the listener
   void _initializeListener() {
@@ -32,8 +29,9 @@ class _All_DoctorState extends State<All_Doctor> {
         .snapshots()
         .listen((snapshot) {
       setState(() {
-        data = snapshot.docs;
-        isloading = false;
+        data.clear(); // Clear existing data before adding new documents
+        data.addAll(snapshot.docs);
+        isLoading = false;
       });
     });
   }
@@ -41,7 +39,6 @@ class _All_DoctorState extends State<All_Doctor> {
   @override
   void initState() {
     super.initState();
-    getsUser('Doctor');
     // Initialize the listener when the widget is first created
     _initializeListener();
   }
@@ -53,30 +50,56 @@ class _All_DoctorState extends State<All_Doctor> {
     super.dispose();
   }
 
-  getsUser(String userType) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Users')
-        .where('Type', isEqualTo: userType)
-        .get();
-    setState(() {
-      data.addAll(querySnapshot.docs);
-      isloading = false;
-    });
+  void _filterDoctors(String query) {
+    if (query.isEmpty) {
+      // If the search query is empty, reload all doctors
+      getsDoctors('Doctor');
+    } else {
+      setState(() {
+        // Filter doctors based on the search query
+        data = data.where((doctor) {
+          String name = doctor['Name'].toLowerCase();
+          return name.startsWith(query.toLowerCase());
+        }).toList();
+      });
+    }
+  }
+
+  void getsDoctors(String userType) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('Type', isEqualTo: userType)
+          .get();
+
+      setState(() {
+        data.clear(); // Clear existing data before adding new documents
+        data.addAll(querySnapshot.docs);
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching doctors: $e');
+      // Handle error as needed
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final emailNumController = TextEditingController();
-    final excel_api = Get.put(excelapi());
+    final excelApi = Get.put(excelapi());
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: constColor,
-        title: Text(
-          'Doctors',
-          style: const TextStyle(
-              fontFamily: 'LibreBaskerville',
-              fontSize: 23,
-              color: Colors.white),
+        title: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Search by Name',
+            hintStyle: TextStyle(color: Colors.white),
+            border: InputBorder.none,
+          ),
+          style: TextStyle(color: Colors.white),
+          onChanged: _filterDoctors,
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -123,7 +146,7 @@ class _All_DoctorState extends State<All_Doctor> {
                     onPressed: () {
                       int emailColumn =
                           int.tryParse(emailNumController.text) ?? 0;
-                      excel_api.deleteUsersInExcel(emailColumn, 'Doctor');
+                      excelApi.deleteUsersInExcel(emailColumn, 'Doctor');
                       Navigator.of(context).pop();
                     },
                   ),
@@ -138,14 +161,18 @@ class _All_DoctorState extends State<All_Doctor> {
           size: 35,
         ),
       ),
-      body: isloading
+      body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
             )
           : GridView.builder(
               itemCount: data.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
+                crossAxisCount: 2,
+                mainAxisExtent: 160,
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 5.0,
+              ),
               itemBuilder: (context, i) {
                 return InkWell(
                   onTap: () {
@@ -192,7 +219,7 @@ class _All_DoctorState extends State<All_Doctor> {
                             .doc(data[i].id)
                             .delete();
                         Navigator.of(context)
-                            .pushReplacementNamed("All_Doctot");
+                            .pushReplacementNamed("All_Doctor");
                       },
                     ).show();
                   },

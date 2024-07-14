@@ -1,15 +1,13 @@
 import 'dart:async';
-
+import 'package:flutter/material.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:ghyabko/api/Excel_api.dart';
 import 'package:ghyabko/screens/Admin/editeUser.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-// ignore: camel_case_types
 class All_Student extends StatefulWidget {
   const All_Student({Key? key}) : super(key: key);
 
@@ -17,11 +15,11 @@ class All_Student extends StatefulWidget {
   State<All_Student> createState() => _All_StudentState();
 }
 
-bool isloading = true;
-
 class _All_StudentState extends State<All_Student> {
   List<QueryDocumentSnapshot> data = [];
+  bool isLoading = true;
   late StreamSubscription<QuerySnapshot> _subscription;
+  TextEditingController _searchController = TextEditingController();
 
   // Function to initialize the listener
   void _initializeListener() {
@@ -31,8 +29,9 @@ class _All_StudentState extends State<All_Student> {
         .snapshots()
         .listen((snapshot) {
       setState(() {
-        data = snapshot.docs;
-        isloading = false;
+        data.clear(); // Clear existing data before adding new documents
+        data.addAll(snapshot.docs);
+        isLoading = false;
       });
     });
   }
@@ -40,7 +39,6 @@ class _All_StudentState extends State<All_Student> {
   @override
   void initState() {
     super.initState();
-    getsUser('Student');
     // Initialize the listener when the widget is first created
     _initializeListener();
   }
@@ -52,31 +50,56 @@ class _All_StudentState extends State<All_Student> {
     super.dispose();
   }
 
-  getsUser(String userType) async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('Users')
-        .where('Type', isEqualTo: userType)
-        .get();
+  void _filterStudents(String query) {
+    if (query.isEmpty) {
+      // If the search query is empty, show all students
+      getsStudents('Student');
+    } else {
+      setState(() {
+        // Filter students based on the search query
+        data = data.where((doc) {
+          String name = doc['Name'].toLowerCase();
+          return name.startsWith(query.toLowerCase());
+        }).toList();
+      });
+    }
+  }
 
-    setState(() {
-      data.addAll(querySnapshot.docs);
-      isloading = false;
-    });
+  void getsStudents(String userType) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('Users')
+          .where('Type', isEqualTo: userType)
+          .get();
+
+      setState(() {
+        data.clear(); // Clear existing data before adding new documents
+        data.addAll(querySnapshot.docs);
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching students: $e');
+      // Handle error as needed
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final emailNumController = TextEditingController();
-    final excel_api = Get.put(excelapi());
+    final excelApi = Get.put(excelapi());
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: constColor,
-        title: Text(
-          'Students',
-          style: const TextStyle(
-              fontFamily: 'LibreBaskerville',
-              fontSize: 23,
-              color: Colors.white),
+        title: TextField(
+          controller: _searchController,
+          decoration: InputDecoration(
+            hintText: 'Search by Name',
+            hintStyle: TextStyle(color: Colors.white),
+            border: InputBorder.none,
+          ),
+          style: TextStyle(color: Colors.white),
+          onChanged: _filterStudents,
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -123,7 +146,7 @@ class _All_StudentState extends State<All_Student> {
                     onPressed: () {
                       int emailColumn =
                           int.tryParse(emailNumController.text) ?? 0;
-                      excel_api.deleteUsersInExcel(emailColumn, 'Student');
+                      excelApi.deleteUsersInExcel(emailColumn, 'Student');
                       Navigator.of(context).pop();
                     },
                   ),
@@ -138,14 +161,18 @@ class _All_StudentState extends State<All_Student> {
           size: 35,
         ),
       ),
-      body: isloading
+      body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
             )
           : GridView.builder(
               itemCount: data.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
+                crossAxisCount: 2,
+                mainAxisExtent: 160,
+                mainAxisSpacing: 5.0,
+                crossAxisSpacing: 5.0,
+              ),
               itemBuilder: (context, i) {
                 return InkWell(
                   onTap: () {
@@ -153,8 +180,8 @@ class _All_StudentState extends State<All_Student> {
                       context: context,
                       dialogType: DialogType.warning,
                       animType: AnimType.rightSlide,
-                      title: 'Are you want to edite?',
-                      desc: 'choose you went to do',
+                      title: 'Are you want to edit?',
+                      desc: 'choose you want to do',
                       btnOkText: 'Delete',
                       btnCancelText: 'Edit',
                       btnCancelOnPress: () {

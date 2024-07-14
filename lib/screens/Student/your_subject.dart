@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghyabko/screens/Student/notification_Screen.dart';
-import 'package:ghyabko/screens/Student/profile.dart';
 import 'package:flutter/material.dart';
+import 'package:ghyabko/screens/Student/profile.dart';
 
 const constColor = Color(0xFF6469d9);
 
@@ -68,39 +68,45 @@ class _YourSubjectState extends State<YourSubject> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
-      body: isloading == true
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : GridView.builder(
-              itemCount: subjectList.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, mainAxisExtent: 160),
-              itemBuilder: (context, i) {
-                return InkWell(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => NotificatePage(
-                              subjectName: subjectList[i],
-                            )));
-                  },
-                  child: Card(
-                    child: Container(
-                      padding: EdgeInsets.all(10),
-                      child: Column(
-                        children: [
-                          Image.asset(
-                            "assets/subjecticon.png",
-                            height: 100,
+      body: Center(
+        child: Container(
+          width: 350, // Fixed width
+          height: 600, // Fixed height
+          child: isloading
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : GridView.builder(
+                  itemCount: subjectList.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, mainAxisExtent: 160),
+                  itemBuilder: (context, i) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => NotificatePage(
+                                  subjectName: subjectList[i],
+                                )));
+                      },
+                      child: Card(
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                "assets/subjecticon.png",
+                                height: 100,
+                              ),
+                              Text("${subjectList[i]}"),
+                            ],
                           ),
-                          Text("${subjectList[i]}"),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+        ),
+      ),
     );
   }
 }

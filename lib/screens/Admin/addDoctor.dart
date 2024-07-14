@@ -1,9 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:ghyabko/api/user_api.dart';
 import 'package:ghyabko/api/Excel_api.dart';
 import 'package:ghyabko/model/user_Model.dart';
 import 'package:ghyabko/screens/auth/Login_Screen.dart';
-import 'package:flutter/material.dart';
 
 class Doctor extends StatefulWidget {
   @override
@@ -13,13 +14,81 @@ class Doctor extends StatefulWidget {
 class _DoctorState extends State<Doctor> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
-  final PasswordController = TextEditingController();
+  final passwordController = TextEditingController();
   final nameNumController = TextEditingController();
   final emailNumController = TextEditingController();
-  final PasswordNumController = TextEditingController();
+  final passwordNumController = TextEditingController();
 
   final user_data = Get.put(userapi());
   final excel_api = Get.put(excelapi());
+
+  Future<void> addDoctor() async {
+    String email = emailController.text.trim();
+    if (!isAcademicEmail(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Academic email only are allowed for doctors.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .where('Email', isEqualTo: email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Doctor already exists'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      final user = UserModel(
+        Email: email,
+        Name: nameController.text.trim(),
+        Password: passwordController.text.trim(),
+        Type: 'Doctor',
+      );
+
+      try {
+        await userapi.instance.addUser(user);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Doctor added successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Clear input fields after successful submission
+        nameController.clear();
+        emailController.clear();
+        passwordController.clear();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error adding doctor: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  bool isAcademicEmail(String email) {
+    String domain = email.split('@').last.toLowerCase();
+    List<String> academicDomains = ['edu'];
+
+    for (String academicDomain in academicDomains) {
+      if (domain.contains(academicDomain)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
@@ -65,6 +134,12 @@ class _DoctorState extends State<Doctor> {
                   alignment: Alignment.center,
                   child: TextFormField(
                     controller: nameController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a name';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
                       icon: Icon(
                         Icons.person,
@@ -89,6 +164,12 @@ class _DoctorState extends State<Doctor> {
                   alignment: Alignment.center,
                   child: TextFormField(
                     controller: emailController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter an email';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
                       icon: Icon(
                         Icons.email,
@@ -112,8 +193,14 @@ class _DoctorState extends State<Doctor> {
                   ),
                   alignment: Alignment.center,
                   child: TextFormField(
-                    controller: PasswordController,
+                    controller: passwordController,
                     obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      return null;
+                    },
                     decoration: InputDecoration(
                       icon: Icon(
                         Icons.vpn_key,
@@ -138,13 +225,7 @@ class _DoctorState extends State<Doctor> {
                       ),
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
-                          final user = UserModel(
-                              Email: emailController.text.trim(),
-                              Name: nameController.text.trim(),
-                              Password: PasswordController.text.trim(),
-                              Type: 'Doctor');
-
-                          userapi.instance.addUser(user);
+                          addDoctor();
                         }
                       },
                       icon: Icon(
@@ -215,7 +296,7 @@ class _DoctorState extends State<Doctor> {
                                       ),
                                       Expanded(
                                         child: TextField(
-                                          controller: PasswordNumController,
+                                          controller: passwordNumController,
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(),
                                         ),
@@ -241,7 +322,7 @@ class _DoctorState extends State<Doctor> {
                                         int.tryParse(emailNumController.text) ??
                                             0;
                                     int passwordColumn = int.tryParse(
-                                            PasswordNumController.text) ??
+                                            passwordNumController.text) ??
                                         0;
 
                                     excelapi.instance.pickFileAndUploadExel(

@@ -1,4 +1,3 @@
-// ignore_for_file: file_names
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ghyabko/main.dart';
@@ -68,69 +67,75 @@ class Profilescreen extends State<Profile> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: SingleChildScrollView(
-          child: Stack(children: [
-            Positioned(
-              top: 0,
-              left: 0,
-              child: Image.asset(
-                "assets/main_top.png",
-                width: mq.width * 0.4,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Image.asset(
-                "assets/login_bottom.png",
-                width: mq.width * 0.4,
-              ),
-            ),
-            const Padding(
-                padding: EdgeInsets.only(top: 70, left: 100),
-                child: Text('Welcome',
-                    style: TextStyle(
-                      color: constColor,
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                    ))),
-            Padding(
-                padding: EdgeInsets.only(top: 200, left: 100),
-                child: Image(
-                    image: AssetImage('assets/logo3.png'),
-                    height: 200,
-                    fit: BoxFit.fill)),
-            Padding(
-              padding: const EdgeInsets.only(top: 400),
-              child: Center(
-                child: Column(
-                  children: [
-                    const SizedBox(
-                      height: 50,
-                    ),
-                    Text("Name : $_currentUserName",
-                        style: TextStyle(
-                          color: constColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        )),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text('Email : $_currentUserEmail',
-                        style: TextStyle(
-                          color: constColor,
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        )),
-                    const SizedBox(
-                      height: 230,
-                    ),
-                  ],
+        body: Center(
+          child: Container(
+            height: 600, // Set a fixed height
+            width: 350, // Set a fixed width
+            child: SingleChildScrollView(
+              child: Stack(children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  child: Image.asset(
+                    "assets/main_top.png",
+                    width: mq.width * 0.4,
+                  ),
                 ),
-              ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Image.asset(
+                    "assets/login_bottom.png",
+                    width: mq.width * 0.4,
+                  ),
+                ),
+                const Padding(
+                    padding: EdgeInsets.only(top: 70, left: 100),
+                    child: Text('Welcome',
+                        style: TextStyle(
+                          color: constColor,
+                          fontSize: 50,
+                          fontWeight: FontWeight.bold,
+                        ))),
+                Padding(
+                    padding: EdgeInsets.only(top: 200, left: 100),
+                    child: Image(
+                        image: AssetImage('assets/GhyabkoLogo2.jpeg'),
+                        height: 200,
+                        fit: BoxFit.fill)),
+                Padding(
+                  padding: const EdgeInsets.only(top: 400),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 50,
+                        ),
+                        Text("Name : $_currentUserName",
+                            style: TextStyle(
+                              color: constColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            )),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text('Email : $_currentUserEmail',
+                            style: TextStyle(
+                              color: constColor,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            )),
+                        const SizedBox(
+                          height: 230,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ]),
             ),
-          ]),
+          ),
         ),
       ),
     );

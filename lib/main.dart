@@ -4,6 +4,7 @@ import 'package:ghyabko/screens/Admin/AllStudent.dart';
 import 'package:ghyabko/screens/Admin/All_Doctor.dart';
 import 'package:ghyabko/screens/Admin/AllSubjects.dart';
 import 'package:ghyabko/screens/login/login.dart';
+import 'package:ghyabko/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
@@ -28,11 +29,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         'LoginPage': (context) => login(),
+        'SplashScreen': (context) => SplashScreen(),
         'Addsubject': (context) => Addsubject(),
         'All_Student': (context) => All_Student(),
         'All_Doctor': (context) => All_Doctor(),
       },
-      initialRoute: 'LoginPage',
+      initialRoute: 'SplashScreen',
     );
   }
 }

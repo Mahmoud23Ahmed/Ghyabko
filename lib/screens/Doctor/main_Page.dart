@@ -1,14 +1,13 @@
-// ignore_for_file: file_names
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ghyabko/screens/Doctor/AttendanceList.dart';
 import 'package:ghyabko/screens/Doctor/FinalReport.dart';
 import 'package:ghyabko/screens/Doctor/nofication_page.dart';
-import 'package:ghyabko/screens/auth/Login_Screen.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
   final String subjectName;
   final String subjectid;
+
   MainPage({
     Key? key,
     required this.subjectName,
@@ -79,76 +78,81 @@ class _MainPageState extends State<MainPage> {
               color: Colors.white),
         ),
       ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 150,
-          ),
-          Center(
-            child: ElevatedButton(
+      body: Center(
+        child: Container(
+          width: 350, // Fixed width
+          height: 600, // Fixed height
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(height: 50),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 14, horizontal: 30),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      textStyle: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.normal)),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: ((context) {
+                      return Notify(subjectName: widget.subjectName);
+                    })));
+                  },
+                  child: const Text(
+                    'Send Notification',
+                    style: TextStyle(color: Colors.white),
+                  )),
+              const SizedBox(height: 50),
+              ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: constColor,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 14, horizontal: 30),
+                        vertical: 14, horizontal: 40),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
                     textStyle: const TextStyle(
-                        fontSize: 30, fontWeight: FontWeight.normal)),
+                      fontSize: 30,
+                      fontWeight: FontWeight.normal,
+                    )),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: ((context) {
-                    return Notify(subjectName: widget.subjectName);
+                    return AttendanceList(subName: widget.subjectName);
                   })));
                 },
                 child: const Text(
-                  'Send Notification',
+                  'Attendance List',
                   style: TextStyle(color: Colors.white),
-                )),
+                ),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: constColor,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 14, horizontal: 70),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      textStyle: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.normal)),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: ((context) {
+                      return FinalReport(
+                        subjectName: widget.subjectName,
+                      );
+                    })));
+                  },
+                  child: const Text(
+                    'Final Report',
+                    style: TextStyle(color: Colors.white),
+                  ))
+            ],
           ),
-          const SizedBox(width: 100, height: 100),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: constColor,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 14, horizontal: 40),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                textStyle: const TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.normal,
-                )),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: ((context) {
-                return AttendanceList(subName: widget.subjectName);
-              })));
-            },
-            child: const Text(
-              'Attendacne List',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 100, height: 100),
-          ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: constColor,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 14, horizontal: 70),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  textStyle: const TextStyle(
-                      fontSize: 30, fontWeight: FontWeight.normal)),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: ((context) {
-                  return FinalReport(
-                    subjectName: widget.subjectName,
-                  );
-                })));
-              },
-              child: const Text(
-                'final Report',
-                style: TextStyle(color: Colors.white),
-              ))
-        ],
+        ),
       ),
     );
   }
